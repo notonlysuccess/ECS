@@ -1,0 +1,59 @@
+{
+  "name": "app-service-engine",
+  "version": "0.0.1",
+  "description": "The engine for app service",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack --hide-modules --config build/webpack.config.js && node build/append_method.js",
+    "test": "jest test/* --silent",
+    "coverage": "jest test/* --coverage --silent"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://git.code.oa.com/wxweb/app-service-engine.git"
+  },
+  "keywords": [
+    "app-service",
+    "engine"
+  ],
+  "author": "hulkhu ",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.13.2",
+    "babel-eslint": "^6.1.2",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-stage-0": "^6.5.0",
+    "eslint": "^3.4.0",
+    "eslint-friendly-formatter": "^2.0.6",
+    "eslint-loader": "^1.5.0",
+    "eslint-plugin-jest": "^20.0.3",
+    "glob": "^7.0.5",
+    "jest-cli": "^20.0.4",
+    "path": "^0.12.7",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.15.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "modulePaths": [
+      "modified_modules"
+    ],
+    "setupFiles": [
+      "./test/vm"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "text",
+      "text-summary"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/deepcopy/",
+      "./test/*",
+      "/node_modules/"
+    ]
+  },
+  "dependencies": {
+    "mocha": "^5.0.1"
+  }
+}
