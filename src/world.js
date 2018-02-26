@@ -26,7 +26,7 @@ export default class World {
 
   start() {
     if (!this._runStatus) {
-      //console.log('start')
+      // console.log('start')
       console.log(this._backgroundSystems)
       this._backgroundSystems.forEach(system => {
         console.log('system start')
@@ -40,7 +40,8 @@ export default class World {
         console.log('-------------------')
         console.log(id++)
         let total = 0
-        for (let name in this.times) {
+
+        for (const name in this.times) {
           console.log(name, this.times[name])
           total += this.times[name]
         }
@@ -50,7 +51,6 @@ export default class World {
   }
 
   update() {
-
     this._systems.forEach(system => {
       if (!this._runStatus) {
         return
@@ -60,6 +60,7 @@ export default class World {
           this.times[system.name] = 0
         }
         const s = Date.now()
+
         system.update.apply(system, arguments)
         this.times[system.name] += (Date.now() - s)
       } else {
@@ -107,6 +108,7 @@ export default class World {
   addComponent(component, value) {
     const isComponent = typeof component !== 'string'
     const name = capitalize(isComponent ? getName(component) : component)
+
     this[name] = isComponent ? component : (value !== undefined ? value : true)
     return this
   }
@@ -155,7 +157,7 @@ export default class World {
   // entity
   addEntity(entity) {
     entity.addToWorld(this)
-    for (let name in this._tuples) {
+    for (const name in this._tuples) {
       this._tuples[name].addEntityIfMatch(entity)
     }
     return this
@@ -163,7 +165,7 @@ export default class World {
 
   removeEntity(entity) {
     entity.removeFromWorld()
-    for (let name in this._tuples) {
+    for (const name in this._tuples) {
       this._tuples[name].removeEntity(entity)
     }
     return this
@@ -175,20 +177,20 @@ export default class World {
     return tuple.entities
   }
 
-  getEntity(id) {
-    return this._tuples[''].entities[id]
+  getEntity(entityId) {
+    return this._tuples[''].entities[entityId]
   }
 
   // invoked by entity when component adding to entity
   addEntityToTuples(entity) {
-    for (let name in this._tuples) {
+    for (const name in this._tuples) {
       this._tuples[name].addEntityIfMatch(entity)
     }
   }
 
   // invoked by entity when component removing from entity
   removeEntityFromTuples(entity) {
-    for (let name in this._tuples) {
+    for (const name in this._tuples) {
       this._tuples[name].removeEntityIfNotMatch(entity)
     }
   }
@@ -198,9 +200,9 @@ export default class World {
 
     if (!this._tuples.hasOwnProperty(name)) {
       this._tuples[name] = new Tuple(Array.prototype.slice.call(componentNames))
-
       const allEntities = this._tuples[''].entities
-      for (let i in allEntities) {
+
+      for (const i in allEntities) {
         this._tuples[name].addEntityIfMatch(allEntities[i])
       }
     }

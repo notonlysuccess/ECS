@@ -1,10 +1,5 @@
-test-result
 .DS_store
-*swp
 node_modules
 npm-debug.log
-page-frame-dist
-sdk.sublime-workspace
-*~
-.idea
-prepare/temp
+test_dist
+coverage

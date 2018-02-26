@@ -45,7 +45,7 @@ export default class Entity {
   }
 
   deleteRemoveFromWorldCb(cb) {
-    for (let i = this._entityRemoveFromWorldCb.length - 1; i >= 0; i --) {
+    for (let i = this._entityRemoveFromWorldCb.length - 1; i >= 0; i--) {
       if (cb === this._entityRemoveFromWorldCb[i]) {
         this._entityRemoveFromWorldCb.splice(i, 1)
         return this
@@ -55,7 +55,7 @@ export default class Entity {
   }
 
   deleteAddToWorldCb(cb) {
-    for (let i = this._entityAddToWorldCb.length - 1; i >= 0; i --) {
+    for (let i = this._entityAddToWorldCb.length - 1; i >= 0; i--) {
       if (cb === this._entityAddToWorldCb[i]) {
         this._entityAddToWorldCb.splice(i, 1)
         return this
@@ -91,7 +91,7 @@ export default class Entity {
   }
 
   has() {
-    for (let i in arguments) {
+    for (const i in arguments) {
       if (!this.hasOwnProperty(capitalize(arguments[i]))) {
         return false
       }
@@ -108,6 +108,7 @@ export default class Entity {
     const isComponent = typeof component !== 'string'
     const name = capitalize(isComponent ? getName(component) : component)
     const hasComponent = this.hasOwnProperty(name)
+
     if (hasComponent && isComponent) {
       this._removeComponentLifeCycle(this[name])
     }

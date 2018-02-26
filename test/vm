@@ -1,0 +1,121 @@
+let ENV_LOADED = false
+let ASE_LOADED = false
+/**
+ * mock小程序运行环境的全局变量
+ */
+
+function loadEnv(__wxConfig = {}) {
+  ENV_LOADED = true
+  Object.assign(global, {
+    wx: require('./mock/wx_mock'),
+    __wxConfig: __wxConfig,
+    __wxRoute: '',
+    __wxRouteBegin: true,
+    WeixinJSBridge: require('./mock/js_bridge_mock'),
+    Reporter: require('./mock/reporter_mock')
+  })
+
+  Object.assign(global.console, {
+    group: jest.fn(),
+    groupEnd: jest.fn(),
+  })
+
+  jest.spyOn(console, 'info')
+  jest.spyOn(console, 'warn')
+  jest.spyOn(console, 'error')
+}
+
+/**
+ * 全局加载 app-service-engine
+ */
+function loadASEngine() {
+  ASE_LOADED = true
+  const {pageHolder, getCurrentPages, getRouteToPage, getTabBarRoutes, getCurrentPage} = require('../src/page/page_manager')
+
+  global.Page = pageHolder
+  global.getCurrentPages = getCurrentPages
+  global.__pageEngine = {
+    getRouteToPage,
+    getTabBarRoutes,
+    getCurrentPage
+  }
+
+  const {appHolder, getApp, getModeInHang, getExitCondition} = require('../src/app/app')
+
+  global.App = appHolder
+  global.getApp = getApp
+  global.__appEngine = {
+    getModeInHang: getModeInHang,
+    getExitCondition: getExitCondition
+  }
+}
+
+/**
+ * 重新加载当前的运行环境
+ */
+function reloadVM(__wxConfig) {
+  jest.resetModules()
+  loadEnv(__wxConfig)
+  if (global.App && global.Page) {
+    loadASEngine()
+  }
+}
+
+/**
+ * 模拟当前运行环境
+ * @param platform 运行环境名称
+ */
+function usePlatform(platform) {
+  switch (platform) {
+    case 'devtools':
+      global.window = {
+        navigator: {
+          userAgent: 'appservice'
+        }
+      }
+      __wxConfig.platform = 'devtools'
+      global.__wxAppData = {}
+      break
+    case 'force-devtools':
+      __wxConfig.platform = 'devtools'
+      global.__wxAppData = {}
+      break
+    case 'android':
+      __wxConfig.platform = 'android'
+      break
+    case 'old-android':
+      global.window = {
+        navigator: {
+          userAgent: 'android'
+        }
+      }
+      break
+    case 'ios':
+      __wxConfig.platform = 'ios'
+      break
+    case 'unknown':
+      global.window = {
+        navigator: {
+          userAgent: 'UNKNOWN'
+        }
+      }
+      break
+    default:
+      delete global.window
+      delete __wxConfig.platform
+  }
+}
+
+if (!global.wx) {
+  loadEnv()
+}
+
+const isEnvLoaded = () => ENV_LOADED
+const isASELoaded = () => ASE_LOADED
+
+export {
+  reloadVM,
+  loadASEngine,
+  isEnvLoaded,
+  isASELoaded
+}

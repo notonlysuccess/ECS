@@ -5,9 +5,8 @@ const capitalize = name => {
 const getName = component => {
   if (typeof (component) === 'function') {
     return component.name
-  } else {
-    return component.constructor.name
   }
+  return component.constructor.name
 }
 
 export {
