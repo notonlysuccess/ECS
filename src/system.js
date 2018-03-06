@@ -6,14 +6,10 @@ export default class System {
   static init() {}
 
   static update() {
-    console.error('system.update must overwrite')
+    throw 'System.update must be overwrited'
   }
 
   static destroy() {}
 
   static stop() {}
-
-  static _getEntities() {
-    return this._world.getEntities.apply(this._world, arguments)
-  }
 }

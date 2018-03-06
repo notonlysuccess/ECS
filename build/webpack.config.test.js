@@ -5,9 +5,11 @@ const webpack = require('webpack')
 var testObject = glob.sync(path.join(__dirname, '../test/', '**/*.test.js')).reduce((object, file) => {
   const lastIndex = file.lastIndexOf('/')
   const fileName = file.substring(lastIndex + 1, file.length - 8)
-  object[fileName] = file
+  object[fileName] = 'mocha!' + file
   return object
 }, {})
+
+console.log(testObject)
 
 module.exports = {
   entry: testObject,

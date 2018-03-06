@@ -1,11 +1,8 @@
 import Tuple from './tuple'
 import {
-  capitalize,
+  lowerCamelCase,
   getName
 } from './utils'
-
-const timer = false
-let id = 0
 
 export default class World {
   constructor() {
@@ -18,36 +15,15 @@ export default class World {
     this._backgroundSystems = []
 
     this._runStatus = false
-
-    if (timer) {
-      this.times = {}
-    }
   }
 
   start() {
     if (!this._runStatus) {
-      // console.log('start')
-      console.log(this._backgroundSystems)
       this._backgroundSystems.forEach(system => {
-        console.log('system start')
         system.start()
       })
     }
     this._runStatus = true
-
-    if (timer) {
-      setInterval(() => {
-        console.log('-------------------')
-        console.log(id++)
-        let total = 0
-
-        for (const name in this.times) {
-          console.log(name, this.times[name])
-          total += this.times[name]
-        }
-        console.log('total', total)
-      }, 5000)
-    }
   }
 
   update() {
@@ -55,32 +31,8 @@ export default class World {
       if (!this._runStatus) {
         return
       }
-      if (timer) {
-        if (!this.times.hasOwnProperty(system.name)) {
-          this.times[system.name] = 0
-        }
-        const s = Date.now()
-
-        system.update.apply(system, arguments)
-        this.times[system.name] += (Date.now() - s)
-      } else {
-        system.update.apply(system, arguments)
-      }
-    })
-  }
-
-  gameStop() {
-    this._systems = []
-  }
-
-  pause() {
-    this._runStatus = false
-    this._backgroundSystems.forEach(system => {
-      if (typeof system.pause === 'function') {
-        system.pause()
-      } else {
-        system.stop()
-      }
+      // usually arguments is dt(delta time of this update and last update) and now(the current time)
+      system.update.apply(system, arguments)
     })
   }
 
@@ -102,19 +54,20 @@ export default class World {
     this._systems.forEach(system => system.destroy())
     this._systems = []
     this._backgroundSystems = []
+    this._runStatus = false
   }
 
   // components
   addComponent(component, value) {
     const isComponent = typeof component !== 'string'
-    const name = capitalize(isComponent ? getName(component) : component)
+    const name = lowerCamelCase(isComponent ? getName(component) : component)
 
     this[name] = isComponent ? component : (value !== undefined ? value : true)
     return this
   }
 
   removeComponent(name) {
-    delete this[capitalize(name)]
+    delete this[lowerCamelCase(name)]
     return this
   }
 
@@ -130,7 +83,7 @@ export default class World {
     for (let i = 0; i < this._systems.length; ++i) {
       if (this._systems[i] === system) {
         this._systems.splice(i, 1)
-        return this
+        break
       }
     }
     return this
@@ -148,7 +101,7 @@ export default class World {
     for (let i = 0; i < this._backgroundSystems.length; ++i) {
       if (this._backgroundSystems[i] === system) {
         this._backgroundSystems.splice(i, 1)
-        return this
+        break
       }
     }
     return this
@@ -209,14 +162,4 @@ export default class World {
 
     return this._tuples[name]
   }
-
-  // set cmd(c) {
-  //   console.log('cmd', c)
-  //   this._cmd = c
-  // }
-
-  // get cmd() {
-  //   return this._cmd
-  // }
-
 }

@@ -1,4 +1,4 @@
-const capitalize = name => {
+const lowerCamelCase = name => {
   return name[0].toLowerCase() + name.slice(1)
 }
 
@@ -10,6 +10,6 @@ const getName = component => {
 }
 
 export {
-  capitalize,
+  lowerCamelCase,
   getName
 }

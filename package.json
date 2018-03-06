@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --hide-modules --config build/webpack.config.js",
     "test": "jest test/*",
-    "coverage": "jest test/* --coverage --silent"
+    "cov": "jest test/* --coverage --silent"
   },
   "repository": {
     "type": "git",
@@ -32,7 +32,8 @@
     "jest-cli": "^20.0.4",
     "path": "^0.12.7",
     "webpack": "^1.13.1",
-    "webpack-dev-server": "^1.15.0"
+    "webpack-dev-server": "^1.15.0",
+    "mocha": "^5.0.1"
   },
   "jest": {
     "testEnvironment": "node",
@@ -48,6 +49,5 @@
     ]
   },
   "dependencies": {
-    "mocha": "^5.0.1"
   }
 }

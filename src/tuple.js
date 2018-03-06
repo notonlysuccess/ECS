@@ -23,6 +23,7 @@ export default class Tuple {
     if (this._entities.hasOwnProperty(entity.id) && !this.matchEntity(entity)) {
       delete this._entities[entity.id]
     }
+    return this
   }
 
   matchEntity(entity) {

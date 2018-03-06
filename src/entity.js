@@ -1,5 +1,5 @@
 import {
-  capitalize,
+  lowerCamelCase,
   getName
 } from './utils'
 
@@ -11,9 +11,19 @@ export default class Entity {
 
     this._world = undefined
 
+    // these callbacks will be called when entity add to world
     this._entityAddToWorldCb = []
 
+    // these callbacks will be called when entity remove from world
     this._entityRemoveFromWorldCb = []
+  }
+
+  get id() {
+    return this._id
+  }
+
+  get world() {
+    return this._world
   }
 
   addToWorld(world) {
@@ -30,10 +40,6 @@ export default class Entity {
     this._world = undefined
   }
 
-  get world() {
-    return this._world
-  }
-
   insertAddToWorldCb(cb) {
     this._entityAddToWorldCb.push(cb)
     return this
@@ -48,7 +54,7 @@ export default class Entity {
     for (let i = this._entityRemoveFromWorldCb.length - 1; i >= 0; i--) {
       if (cb === this._entityRemoveFromWorldCb[i]) {
         this._entityRemoveFromWorldCb.splice(i, 1)
-        return this
+        break
       }
     }
     return this
@@ -58,41 +64,15 @@ export default class Entity {
     for (let i = this._entityAddToWorldCb.length - 1; i >= 0; i--) {
       if (cb === this._entityAddToWorldCb[i]) {
         this._entityAddToWorldCb.splice(i, 1)
-        return this
+        break
       }
-    }
-    return this
-  }
-
-  _addComponentLifeCycle(component) {
-    if (component.addToEntityCb) {
-      component.addToEntityCb(this)
-    }
-    if (component.entityAddToWorldCb) {
-      this.insertAddToWorldCb(component.entityAddToWorldCb.bind(component))
-    }
-    if (component.entityRemoveFromWorldCb) {
-      this.insertRemoveFromWorldCb(component.entityRemoveFromWorldCb.bind(component))
-    }
-    return this
-  }
-
-  _removeComponentLifeCycle(component) {
-    if (component.entityAddToWorldCb) {
-      this.deleteAddToWorldCb(component.entityAddToWorldCb.bind(component))
-    }
-    if (component.entityRemoveFromWorldCb) {
-      this.deleteRemoveFromWorldCb(component.entityRemoveFromWorldCb.bind(component))
-    }
-    if (component.removeFromEntityCb) {
-      component.removeFromEntityCb(this)
     }
     return this
   }
 
   has() {
     for (const i in arguments) {
-      if (!this.hasOwnProperty(capitalize(arguments[i]))) {
+      if (!this.hasOwnProperty(lowerCamelCase(arguments[i]))) {
         return false
       }
     }
@@ -106,14 +86,16 @@ export default class Entity {
    */
   addComponent(component, value) {
     const isComponent = typeof component !== 'string'
-    const name = capitalize(isComponent ? getName(component) : component)
+    const name = lowerCamelCase(isComponent ? getName(component) : component)
     const hasComponent = this.hasOwnProperty(name)
 
     if (hasComponent && isComponent) {
       this._removeComponentLifeCycle(this[name])
     }
     this[name] = isComponent ? component : (value !== undefined ? value : true)
-    this._addComponentLifeCycle(this[name])
+    if (isComponent) {
+      this._addComponentLifeCycle(this[name])
+    }
 
     if (!hasComponent && this._world) {
       this._world.addEntityToTuples(this)
@@ -122,7 +104,7 @@ export default class Entity {
   }
 
   removeComponent(name) {
-    name = capitalize(name)
+    name = lowerCamelCase(name)
     if (this.hasOwnProperty(name)) {
       this._removeComponentLifeCycle(this[name])
       delete this[name]
@@ -133,7 +115,33 @@ export default class Entity {
     return this
   }
 
-  get id() {
-    return this._id
+  _addComponentLifeCycle(component) {
+    if (component.addToEntityCb) {
+      // it will be called when component added to entity
+      component.addToEntityCb(this)
+    }
+    if (component.entityAddToWorldCb) {
+      // it will be called when entity add to world
+      this.insertAddToWorldCb(component.entityAddToWorldCb)
+    }
+    if (component.entityRemoveFromWorldCb) {
+      // it will be called when entity remove from world
+      this.insertRemoveFromWorldCb(component.entityRemoveFromWorldCb)
+    }
+    return this
+  }
+
+  _removeComponentLifeCycle(component) {
+    if (component.entityAddToWorldCb) {
+      this.deleteAddToWorldCb(component.entityAddToWorldCb)
+    }
+    if (component.entityRemoveFromWorldCb) {
+      this.deleteRemoveFromWorldCb(component.entityRemoveFromWorldCb)
+    }
+    if (component.removeFromEntityCb) {
+      // it will be called when component remove from entity
+      component.removeFromEntityCb(this)
+    }
+    return this
   }
 }
