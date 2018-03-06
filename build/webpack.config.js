@@ -17,15 +17,5 @@ module.exports = {
         ]
       }
     ]
-  },
-  //eslint: {
-    //configFile: path.join(__dirname, '../.eslintrc'),
-    //formatter: require('eslint-friendly-formatter')
-  //},
-  //resolve: {
-    //extensions: ['', '.js'],
-    //root: [
-      //path.join(__dirname, '../node_modules'),
-    //]
-  //}
+  }
 }
