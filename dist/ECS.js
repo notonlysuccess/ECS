@@ -96,9 +96,6 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var timer = false;
-	var id = 0;
-
 	var World = function () {
 	  function World() {
 	    _classCallCheck(this, World);
@@ -112,79 +109,30 @@
 	    this._backgroundSystems = [];
 
 	    this._runStatus = false;
-
-	    if (timer) {
-	      this.times = {};
-	    }
 	  }
 
 	  _createClass(World, [{
 	    key: 'start',
 	    value: function start() {
-	      var _this = this;
-
 	      if (!this._runStatus) {
-	        // console.log('start')
-	        console.log(this._backgroundSystems);
 	        this._backgroundSystems.forEach(function (system) {
-	          console.log('system start');
 	          system.start();
 	        });
 	      }
 	      this._runStatus = true;
-
-	      if (timer) {
-	        setInterval(function () {
-	          console.log('-------------------');
-	          console.log(id++);
-	          var total = 0;
-
-	          for (var name in _this.times) {
-	            console.log(name, _this.times[name]);
-	            total += _this.times[name];
-	          }
-	          console.log('total', total);
-	        }, 5000);
-	      }
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      var _this2 = this,
+	      var _this = this,
 	          _arguments = arguments;
 
 	      this._systems.forEach(function (system) {
-	        if (!_this2._runStatus) {
+	        if (!_this._runStatus) {
 	          return;
 	        }
-	        if (timer) {
-	          if (!_this2.times.hasOwnProperty(system.name)) {
-	            _this2.times[system.name] = 0;
-	          }
-	          var s = Date.now();
-
-	          system.update.apply(system, _arguments);
-	          _this2.times[system.name] += Date.now() - s;
-	        } else {
-	          system.update.apply(system, _arguments);
-	        }
-	      });
-	    }
-	  }, {
-	    key: 'gameStop',
-	    value: function gameStop() {
-	      this._systems = [];
-	    }
-	  }, {
-	    key: 'pause',
-	    value: function pause() {
-	      this._runStatus = false;
-	      this._backgroundSystems.forEach(function (system) {
-	        if (typeof system.pause === 'function') {
-	          system.pause();
-	        } else {
-	          system.stop();
-	        }
+	        // usually arguments is dt(delta time of this update and last update) and now(the current time)
+	        system.update.apply(system, _arguments);
 	      });
 	    }
 	  }, {
@@ -210,6 +158,7 @@
 	      });
 	      this._systems = [];
 	      this._backgroundSystems = [];
+	      this._runStatus = false;
 	    }
 
 	    // components
@@ -218,7 +167,7 @@
 	    key: 'addComponent',
 	    value: function addComponent(component, value) {
 	      var isComponent = typeof component !== 'string';
-	      var name = (0, _utils.capitalize)(isComponent ? (0, _utils.getName)(component) : component);
+	      var name = (0, _utils.lowerCamelCase)(isComponent ? (0, _utils.getName)(component) : component);
 
 	      this[name] = isComponent ? component : value !== undefined ? value : true;
 	      return this;
@@ -226,7 +175,7 @@
 	  }, {
 	    key: 'removeComponent',
 	    value: function removeComponent(name) {
-	      delete this[(0, _utils.capitalize)(name)];
+	      delete this[(0, _utils.lowerCamelCase)(name)];
 	      return this;
 	    }
 
@@ -246,7 +195,7 @@
 	      for (var i = 0; i < this._systems.length; ++i) {
 	        if (this._systems[i] === system) {
 	          this._systems.splice(i, 1);
-	          return this;
+	          break;
 	        }
 	      }
 	      return this;
@@ -268,7 +217,7 @@
 	      for (var i = 0; i < this._backgroundSystems.length; ++i) {
 	        if (this._backgroundSystems[i] === system) {
 	          this._backgroundSystems.splice(i, 1);
-	          return this;
+	          break;
 	        }
 	      }
 	      return this;
@@ -342,16 +291,6 @@
 
 	      return this._tuples[name];
 	    }
-
-	    // set cmd(c) {
-	    //   console.log('cmd', c)
-	    //   this._cmd = c
-	    // }
-
-	    // get cmd() {
-	    //   return this._cmd
-	    // }
-
 	  }]);
 
 	  return World;
@@ -406,6 +345,7 @@
 	      if (this._entities.hasOwnProperty(entity.id) && !this.matchEntity(entity)) {
 	        delete this._entities[entity.id];
 	      }
+	      return this;
 	    }
 	  }, {
 	    key: "matchEntity",
@@ -473,8 +413,10 @@
 
 	    this._world = undefined;
 
+	    // these callbacks will be called when entity add to world
 	    this._entityAddToWorldCb = [];
 
+	    // these callbacks will be called when entity remove from world
 	    this._entityRemoveFromWorldCb = [];
 	  }
 
@@ -512,7 +454,7 @@
 	      for (var i = this._entityRemoveFromWorldCb.length - 1; i >= 0; i--) {
 	        if (cb === this._entityRemoveFromWorldCb[i]) {
 	          this._entityRemoveFromWorldCb.splice(i, 1);
-	          return this;
+	          break;
 	        }
 	      }
 	      return this;
@@ -523,7 +465,7 @@
 	      for (var i = this._entityAddToWorldCb.length - 1; i >= 0; i--) {
 	        if (cb === this._entityAddToWorldCb[i]) {
 	          this._entityAddToWorldCb.splice(i, 1);
-	          return this;
+	          break;
 	        }
 	      }
 	      return this;
@@ -587,11 +529,11 @@
 	      }
 	      if (component.entityAddToWorldCb) {
 	        // it will be called when entity add to world
-	        this.insertAddToWorldCb(component.entityAddToWorldCb.bind(component));
+	        this.insertAddToWorldCb(component.entityAddToWorldCb);
 	      }
 	      if (component.entityRemoveFromWorldCb) {
 	        // it will be called when entity remove from world
-	        this.insertRemoveFromWorldCb(component.entityRemoveFromWorldCb.bind(component));
+	        this.insertRemoveFromWorldCb(component.entityRemoveFromWorldCb);
 	      }
 	      return this;
 	    }
@@ -599,10 +541,10 @@
 	    key: '_removeComponentLifeCycle',
 	    value: function _removeComponentLifeCycle(component) {
 	      if (component.entityAddToWorldCb) {
-	        this.deleteAddToWorldCb(component.entityAddToWorldCb.bind(component));
+	        this.deleteAddToWorldCb(component.entityAddToWorldCb);
 	      }
 	      if (component.entityRemoveFromWorldCb) {
-	        this.deleteRemoveFromWorldCb(component.entityRemoveFromWorldCb.bind(component));
+	        this.deleteRemoveFromWorldCb(component.entityRemoveFromWorldCb);
 	      }
 	      if (component.removeFromEntityCb) {
 	        // it will be called when component remove from entity
@@ -657,7 +599,7 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      console.error('system.update must overwrite');
+	      throw 'System.update must be overwrited';
 	    }
 	  }, {
 	    key: 'destroy',
@@ -665,11 +607,6 @@
 	  }, {
 	    key: 'stop',
 	    value: function stop() {}
-	  }, {
-	    key: '_getEntities',
-	    value: function _getEntities() {
-	      return this._world.getEntities.apply(this._world, arguments);
-	    }
 	  }]);
 
 	  return System;
@@ -707,17 +644,12 @@
 	  }, {
 	    key: 'start',
 	    value: function start() {
-	      console.error('backgroundSystem.start must be overwrited');
+	      throw 'BackgroundSystem.start must be overwrited';
 	    }
 	  }, {
 	    key: 'stop',
 	    value: function stop() {
-	      console.error('backgroundSystem.stop must be overwrited');
-	    }
-	  }, {
-	    key: '_getEntities',
-	    value: function _getEntities() {
-	      return this._world.getEntities.apply(this._world, arguments);
+	      throw 'BackgroundSystem.stop must be overwrited';
 	    }
 	  }]);
 
