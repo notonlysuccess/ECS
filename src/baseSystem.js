@@ -26,7 +26,7 @@ export default class BaseSystem {
 
   static removeComponent(name) {
     if (this._world === undefined) {
-      throw `System did't add to world`
+      throw 'System did\'t add to world'
     }
     if (this._restrictRemove.indexOf(name) === -1) {
       throw `Restrict to remove ${name}`
@@ -36,7 +36,7 @@ export default class BaseSystem {
 
   static getComponent(name) {
     if (this._world === undefined) {
-      throw `System did't add to world`
+      throw 'System did\'t add to world'
     }
     if (this._restrictGet.indexOf(name) === -1) {
       throw `Restrict to get ${name}`
@@ -48,11 +48,11 @@ export default class BaseSystem {
 
   static addComponent(component, value) {
     if (this._world === undefined) {
-      throw `System did't add to world`
+      throw 'System did\'t add to world'
     }
-
     const isComponent = typeof component !== 'string'
     const name = lowerCamelCase(isComponent ? getName(component) : component)
+
     if (this._restrictAdd.indexOf(name) === -1) {
       throw `Restrict to add ${name}`
     }
@@ -61,7 +61,7 @@ export default class BaseSystem {
 
   static getEntities() {
     if (this._world === undefined) {
-      throw `System did't add to world`
+      throw 'System did\'t add to world'
     }
 
     return this._world.getEntities(...arguments)
