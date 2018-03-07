@@ -15,15 +15,7 @@ class Component2 {
   }
 }
 
-const WORLD_SYMBOL = 'worldSymbol'
 describe('Entity Test', () => {
-  let world
-
-  beforeEach(() => {
-    world = new World()
-    world.symbol = WORLD_SYMBOL
-  })
-
   it('Entity id', () => {
     const entities = []
 
@@ -36,51 +28,51 @@ describe('Entity Test', () => {
   })
 
   it('AddToWorld', () => {
+    const world = new World()
     const entity = new Entity()
-    let _entityAddToWorldCbCalled = false
-    entity._entityAddToWorldCb.push(() => {
-      _entityAddToWorldCbCalled = true
-    })
+    const cb = jest.fn()
+    entity._entityAddToWorldCb.push(cb)
     entity.addToWorld(world)
-    expect(entity._world.symbol).toEqual(WORLD_SYMBOL)
-    expect(_entityAddToWorldCbCalled).toBeTruthy()
+    expect(entity._world).toEqual(world)
+    expect(cb).toHaveBeenCalled()
   })
 
   it('removeFromWorld', () => {
+    const world = new World()
     const entity = new Entity()
-    let _entityRemoveFromWorldCbCalled = false
-    entity._entityRemoveFromWorldCb.push(() => {
-      _entityRemoveFromWorldCbCalled = true
-    })
+    const cb = jest.fn()
+    entity._entityRemoveFromWorldCb.push(cb)
     entity.addToWorld(world)
     entity.removeFromWorld()
     expect(entity._world).toBeUndefined()
-    expect(_entityRemoveFromWorldCbCalled).toBeTruthy()
+    expect(cb).toHaveBeenCalled()
   })
 
   it('getWorld', () => {
+    const world = new World()
     const entity = new Entity()
     entity.addToWorld(world)
-    expect(entity.world.symbol).toEqual(WORLD_SYMBOL)
+    expect(entity.world).toEqual(world)
   })
 
   it('insertAddToWorldCb', () => {
-    let count = 0
+    const world = new World()
     const entity = new Entity()
-    const cb1 = () => count += 1
-    const cb2 = () => count += 10
+    const cb1 = jest.fn()
+    const cb2 = jest.fn()
     const returnEntity = entity.insertAddToWorldCb(cb1)
     entity.insertAddToWorldCb(cb2)
     entity.addToWorld(world)
-    expect(count).toEqual(11)
 
-    expect(returnEntity.id).toEqual(entity.id)
+    expect(returnEntity).toEqual(entity)
+    expect(cb1).toHaveBeenCalled()
+    expect(cb2).toHaveBeenCalled()
   })
 
   it('insertRemoveFromWorldCb', () => {
     const entity = new Entity()
-    const cb1 = () => console.log(1)
-    const cb2 = () => console.log(2)
+    const cb1 = jest.fn()
+    const cb2 = jest.fn()
     const returnEntity = entity.insertAddToWorldCb(cb1)
     expect(entity._entityAddToWorldCb.length).toEqual(1)
     entity.insertAddToWorldCb(cb2)
@@ -91,8 +83,8 @@ describe('Entity Test', () => {
 
   it('deleteAddToWorldCb', () => {
     const entity = new Entity()
-    const cb1 = () => console.log(1)
-    const cb2 = () => console.log(2)
+    const cb1 = jest.fn()
+    const cb2 = jest.fn()
     entity.insertAddToWorldCb(cb1)
     entity.insertAddToWorldCb(cb2)
     expect(entity._entityAddToWorldCb.length).toEqual(2)
@@ -105,8 +97,8 @@ describe('Entity Test', () => {
 
   it('deleteRemoveFromWorldCb', () => {
     const entity = new Entity()
-    const cb1 = () => console.log(1)
-    const cb2 = () => console.log(2)
+    const cb1 = jest.fn()
+    const cb2 = jest.fn()
     entity.insertRemoveFromWorldCb(cb1)
     entity.insertRemoveFromWorldCb(cb2)
     expect(entity._entityRemoveFromWorldCb.length).toEqual(2)
@@ -145,55 +137,47 @@ describe('Entity Test', () => {
   })
 
   it('addComponent: inner function', () => {
+    const world = new World()
     const entity = new Entity()
-    const testValue = 'testAddComponnetInnerFunction'
-    const component1 = new Component1(testValue)
-    const component2 = new Component2(testValue)
-    // mock Entity._addComponentLifeCycle
-    let entity_addComponentLifeCycleCount = 0
-    entity._addComponentLifeCycle = c => {
-      expect(c.value).toEqual(testValue)
-      ++entity_addComponentLifeCycleCount
-    }
-    // mock Entity._removeComponentLifeCycle
-    let entity_removeComponentLifeCycleCount = 0
-    entity._removeComponentLifeCycle = c => {
-      expect(c.value).toEqual(testValue)
-      ++entity_removeComponentLifeCycleCount
-    }
-    // mock World.removeEntityFromTuples
-    let world_addEntityToTuplesCount = 0
-    world.addEntityToTuples = e => {
-      expect(e.id).toEqual(entity.id)
-      ++world_addEntityToTuplesCount
-    }
+    const component1 = new Component1('c1test')
+    const component2 = new Component2('c2test')
+    entity._addComponentLifeCycle = jest.fn()
+    entity._removeComponentLifeCycle = jest.fn()
+    world.addEntityToTuples = jest.fn()
     // add first component(tag)
     entity.addComponent('tag')
-    expect(entity_addComponentLifeCycleCount).toEqual(0)
-    expect(entity_removeComponentLifeCycleCount).toEqual(0)
-    expect(world_addEntityToTuplesCount).toEqual(0)
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(0)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(0)
+    expect(world.addEntityToTuples).toHaveBeenCalledTimes(0)
     // add second component(component)
     entity.addComponent(component1)
-    expect(entity_addComponentLifeCycleCount).toEqual(1)
-    expect(entity_removeComponentLifeCycleCount).toEqual(0)
-    expect(world_addEntityToTuplesCount).toEqual(0)
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(1)
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledWith(component1)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(0)
+    expect(world.addEntityToTuples).toHaveBeenCalledTimes(0)
     // add same component(component)
     entity.addComponent(component1)
-    expect(entity_addComponentLifeCycleCount).toEqual(2)
-    expect(entity_removeComponentLifeCycleCount).toEqual(1)
-    expect(world_addEntityToTuplesCount).toEqual(0)
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(2)
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledWith(component1)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(1)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(component1)
+    expect(world.addEntityToTuples).toHaveBeenCalledTimes(0)
     // add entity to world
     entity.addToWorld(world)
     // add third component(component)
     entity.addComponent(component2)
-    expect(entity_addComponentLifeCycleCount).toEqual(3)
-    expect(entity_removeComponentLifeCycleCount).toEqual(1)
-    expect(world_addEntityToTuplesCount).toEqual(1)
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(3)
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledWith(component2)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(1)
+    expect(world.addEntityToTuples).toHaveBeenCalledTimes(1)
+    expect(world.addEntityToTuples).toHaveBeenCalledWith(entity)
     // add some component(component)
     entity.addComponent(component2)
-    expect(entity_addComponentLifeCycleCount).toEqual(4)
-    expect(entity_removeComponentLifeCycleCount).toEqual(2)
-    expect(world_addEntityToTuplesCount).toEqual(1)
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(4)
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledWith(component2)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(2)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(component2)
+    expect(world.addEntityToTuples).toHaveBeenCalledTimes(1)
   })
 
   it('removeComponent', () => {
@@ -216,40 +200,39 @@ describe('Entity Test', () => {
   })
 
   it('removeComponent: inner function', () => {
+    const world = new World()
     const entity = new Entity()
-    // mock Entity._removeComponentLifeCycle
-    let entity_removeComponentLifeCycleCount = 0
-    entity._removeComponentLifeCycle = () => {
-      ++entity_removeComponentLifeCycleCount
-    }
-    // mock World.removeEntityFromTuples
-    let world_removeEntityFromTuplesCount = 0
-    world.removeEntityFromTuples = e => {
-      expect(e.id).toEqual(entity.id)
-      ++world_removeEntityFromTuplesCount
-    }
+    entity._removeComponentLifeCycle = jest.fn()
+    world.removeEntityFromTuples = jest.fn()
+
     // add components
-    entity.addComponent(Component1)
-    entity.addComponent(new Component2('test2'))
+    const component1 = Component1
+    const component2 = new Component2('test')
+    entity.addComponent(component1)
+    entity.addComponent(component2)
     entity.addComponent('tag')
     // remove first component
     entity.removeComponent('component1')
-    expect(entity_removeComponentLifeCycleCount).toEqual(1)
-    expect(world_removeEntityFromTuplesCount).toEqual(0)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(1)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(component1)
+    expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(0)
     // remove second component
     entity.removeComponent('component2')
-    expect(entity_removeComponentLifeCycleCount).toEqual(2)
-    expect(world_removeEntityFromTuplesCount).toEqual(0)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(2)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(component2)
+    expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(0)
     // remove some component
     entity.removeComponent('component2')
-    expect(entity_removeComponentLifeCycleCount).toEqual(2)
-    expect(world_removeEntityFromTuplesCount).toEqual(0)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(2)
+    expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(0)
     // add to world then remove the remain two components
     entity.addToWorld(world)
     // remove third component
     entity.removeComponent('tag')
-    expect(entity_removeComponentLifeCycleCount).toEqual(3)
-    expect(world_removeEntityFromTuplesCount).toEqual(1)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(3)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(true)
+    expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(1)
+    expect(world.removeEntityFromTuples).toHaveBeenCalledWith(entity)
   })
 
   it('has', () => {
@@ -265,45 +248,30 @@ describe('Entity Test', () => {
   it('_addComponentLifeCycle', () => {
     const entity = new Entity()
     const component = new Component1('value')
-    component.addToEntityCb = function(e) {
-      expect(e.id).toEqual(entity.id)
-      this.value += '1'
-    }
-    component.entityAddToWorldCb = function() {
-      this.value += '2'
-    }
-    component.entityRemoveFromWorldCb = function() {
-      this.value += '3'
-    }
-    component.entityRemoveFromWorldCb = component.entityRemoveFromWorldCb.bind(component)
-    component.entityAddToWorldCb = component.entityAddToWorldCb.bind(component)
+    component.addToEntityCb = jest.fn()
+    component.entityAddToWorldCb = jest.fn()
+    component.entityRemoveFromWorldCb = jest.fn()
 
     entity._addComponentLifeCycle(component)
-    expect(component.value).toEqual('value1')
+
+    expect(component.addToEntityCb).toHaveBeenCalledWith(entity)
     expect(entity._entityAddToWorldCb.length).toEqual(1)
     expect(entity._entityRemoveFromWorldCb.length).toEqual(1)
-    entity._entityAddToWorldCb[0]()
-    expect(component.value).toEqual('value12')
-    entity._entityRemoveFromWorldCb[0]()
-    expect(component.value).toEqual('value123')
   })
 
   it('_removeComponentLifeCycle', () => {
     const entity = new Entity()
     const component = new Component1('value')
-    component.removeFromEntityCb = function(e) {
-      expect(e.id).toEqual(entity.id)
-      this.value += '1'
-    }
-    component.entityAddToWorldCb = function() {}
-    component.entityRemoveFromWorldCb = function() {}
+    component.removeFromEntityCb = jest.fn()
+    component.entityAddToWorldCb = jest.fn()
+    component.entityRemoveFromWorldCb = jest.fn()
 
     entity._addComponentLifeCycle(component)
     expect(entity._entityAddToWorldCb.length).toEqual(1)
     expect(entity._entityRemoveFromWorldCb.length).toEqual(1)
 
     entity._removeComponentLifeCycle(component)
-    expect(component.value).toEqual('value1')
+    expect(component.removeFromEntityCb).toHaveBeenCalledWith(entity)
     expect(entity._entityAddToWorldCb.length).toEqual(0)
     expect(entity._entityRemoveFromWorldCb.length).toEqual(0)
   })

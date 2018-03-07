@@ -9,7 +9,7 @@ export default class System {
     throw 'System.update must be overwrited'
   }
 
-  static destroy() {}
-
   static stop() {}
+
+  static destroy() {}
 }

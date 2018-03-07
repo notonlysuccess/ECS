@@ -31,16 +31,13 @@ describe('World Test', () => {
   })
 
   it('addSystem', () => {
-    let systemInitCalled = false
-    TestSystem.init = () => {
-      systemInitCalled = true
-    }
+    TestSystem.init = jest.fn()
 
     const world = new World()
     const returnWorld = world.addSystem(TestSystem)
 
     expect(returnWorld).toEqual(world)
-    expect(systemInitCalled).toBeTruthy()
+    expect(TestSystem.init).toHaveBeenCalled()
     expect(TestSystem._world).toEqual(world)
     expect(world._systems.length).toEqual(1)
     expect(world._systems[0]).toEqual(TestSystem)
@@ -57,16 +54,13 @@ describe('World Test', () => {
   })
 
   it('addBackgroundSystem', () => {
-    let backgroundInitCalled = false
-    TestBackgroundSystem.init = () => {
-      backgroundInitCalled = true
-    }
+    TestBackgroundSystem.init = jest.fn()
 
     const world = new World()
     const returnWorld = world.addBackgroundSystem(TestBackgroundSystem)
 
     expect(returnWorld).toEqual(world)
-    expect(backgroundInitCalled).toBeTruthy()
+    expect(TestBackgroundSystem.init).toHaveBeenCalled()
     expect(TestBackgroundSystem._world).toEqual(world)
     expect(world._backgroundSystems.length).toEqual(1)
     expect(world._backgroundSystems[0]).toEqual(TestBackgroundSystem)
@@ -115,41 +109,26 @@ describe('World Test', () => {
     const world = new World()
     const entity = new Entity()
 
-    let addToWorldCalled = false
-    let addEntityIfMatchCalled = false
-    entity.addToWorld = w => {
-      expect(w).toEqual(world)
-      addToWorldCalled = true
-    }
-    world._tuples[''].addEntityIfMatch = e => {
-      expect(e).toEqual(entity)
-      addEntityIfMatchCalled = true
-    }
+    entity.addToWorld = jest.fn()
+    world._tuples[''].addEntityIfMatch = jest.fn()
     const returnWorld = world.addEntity(entity)
 
     expect(returnWorld).toEqual(world)
-    expect(addToWorldCalled).toBeTruthy()
-    expect(addEntityIfMatchCalled).toBeTruthy()
+    expect(entity.addToWorld).toHaveBeenCalledWith(world)
+    expect(world._tuples[''].addEntityIfMatch).toHaveBeenCalledWith(entity)
   })
 
   it('removeEntity', () => {
     const world = new World()
     const entity = new Entity()
 
-    let removeFromWorldCalled = false
-    let removeEntityCalled = false
-    entity.removeFromWorld = () => {
-      removeFromWorldCalled = true
-    }
-    world._tuples[''].removeEntity = e => {
-      expect(e).toEqual(entity)
-      removeEntityCalled = true
-    }
+    entity.removeFromWorld = jest.fn()
+    world._tuples[''].removeEntity = jest.fn()
     const returnWorld = world.removeEntity(entity)
 
     expect(returnWorld).toEqual(world)
-    expect(removeFromWorldCalled).toBeTruthy()
-    expect(removeEntityCalled).toBeTruthy()
+    expect(entity.removeFromWorld).toHaveBeenCalled()
+    expect(world._tuples[''].removeEntity).toHaveBeenCalledWith(entity)
   })
 
   it('getEntities', () => {
@@ -175,25 +154,17 @@ describe('World Test', () => {
   it('addEntityToTuples', () => {
     const world = new World()
     const entity = new Entity()
-    let addEntityIfMatchCalled = false
-    world._tuples[''].addEntityIfMatch = e => {
-      expect(e).toEqual(entity)
-      addEntityIfMatchCalled = true
-    }
+    world._tuples[''].addEntityIfMatch = jest.fn()
     world.addEntityToTuples(entity)
-    expect(addEntityIfMatchCalled).toBeTruthy()
+    expect(world._tuples[''].addEntityIfMatch).toHaveBeenCalledWith(entity)
   })
 
   it('removeEntityFromTuples', () => {
     const world = new World()
     const entity = new Entity()
-    let removeEntityIfNotMatchCalled = false
-    world._tuples[''].removeEntityIfNotMatch = e => {
-      expect(e).toEqual(entity)
-      removeEntityIfNotMatchCalled = true
-    }
+    world._tuples[''].removeEntityIfNotMatch = jest.fn()
     world.removeEntityFromTuples(entity)
-    expect(removeEntityIfNotMatchCalled).toBeTruthy()
+    expect(world._tuples[''].removeEntityIfNotMatch).toHaveBeenCalledWith(entity)
   })
 
   it('_ensureTupleExists', () => {
@@ -275,14 +246,8 @@ describe('World Test', () => {
 
   it('stop', () => {
     const world = new World()
-    let systemStopCalled = false
-    let backgroundSystemStopCalled = false
-    TestSystem.stop = () => {
-      systemStopCalled = true
-    }
-    TestBackgroundSystem.stop = () => {
-      backgroundSystemStopCalled = true
-    }
+    TestSystem.stop = jest.fn()
+    TestBackgroundSystem.stop = jest.fn()
     world.addSystem(TestSystem)
     world.addBackgroundSystem(TestBackgroundSystem)
 
@@ -290,24 +255,23 @@ describe('World Test', () => {
     world.stop()
 
     expect(world._runStatus).toBeFalsy()
-    expect(systemStopCalled).toBeTruthy()
-    expect(backgroundSystemStopCalled).toBeTruthy()
+    expect(TestSystem.stop).toHaveBeenCalled()
+    expect(TestBackgroundSystem.stop).toHaveBeenCalled()
   })
 
-  it('clear', () => {
+  it('destroy', () => {
     const world = new World()
     const entity = new Entity()
     world.addEntity(entity)
     world.addSystem(TestSystem)
     world.addBackgroundSystem(TestBackgroundSystem)
 
-    let systemDestoryCalled = true
-    TestSystem.destory = () => {
-      systemDestoryCalled = true
-    }
+    TestSystem.destroy = jest.fn()
+    TestBackgroundSystem.destroy = jest.fn()
 
-    world.clear()
-    expect(systemDestoryCalled).toBeTruthy()
+    world.destroy()
+    expect(TestSystem.destroy).toHaveBeenCalled()
+    expect(TestBackgroundSystem.destroy).toHaveBeenCalled()
     expect(world._tuples).toEqual({'': new Tuple([])})
     expect(world._systems).toEqual([])
     expect(world._backgroundSystems).toEqual([])

@@ -47,11 +47,12 @@ export default class World {
     })
   }
 
-  clear() {
+  destroy() {
     this._tuples = {
       '': new Tuple([])
     }
     this._systems.forEach(system => system.destroy())
+    this._backgroundSystems.forEach(system => system.destroy())
     this._systems = []
     this._backgroundSystems = []
     this._runStatus = false

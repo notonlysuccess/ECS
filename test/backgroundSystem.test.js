@@ -18,4 +18,9 @@ describe('BackgroundSystem test', () => {
   it('stop', () => {
     expect(TestBackgroundSystem.stop).toThrowError('BackgroundSystem.stop must be overwrited')
   })
+
+  it('function check', () => {
+    TestBackgroundSystem.init()
+    TestBackgroundSystem.destroy()
+  })
 })

@@ -12,4 +12,6 @@ export default class BackgroundSystem {
   static stop() {
     throw 'BackgroundSystem.stop must be overwrited'
   }
+
+  static destroy() {}
 }

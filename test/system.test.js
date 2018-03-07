@@ -14,4 +14,9 @@ describe('System test', () => {
   it('update', () => {
     expect(TestSystem.update).toThrowError('System.update must be overwrited')
   })
+
+  it('function check', () => {
+    TestSystem.init()
+    TestSystem.destroy()
+  })
 })
