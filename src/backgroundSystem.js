@@ -1,10 +1,6 @@
-export default class BackgroundSystem {
-  static addWorld(world) {
-    this._world = world
-  }
+import BaseSystem from './baseSystem'
 
-  static init() {}
-
+export default class BackgroundSystem extends BaseSystem {
   static start() {
     throw 'BackgroundSystem.start must be overwrited'
   }
@@ -12,6 +8,4 @@ export default class BackgroundSystem {
   static stop() {
     throw 'BackgroundSystem.stop must be overwrited'
   }
-
-  static destroy() {}
 }

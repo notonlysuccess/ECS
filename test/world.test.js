@@ -28,6 +28,7 @@ describe('World Test', () => {
     expect(world._systems).toEqual([])
     expect(world._backgroundSystems).toEqual([])
     expect(world._runStatus).toBeFalsy()
+    expect(world._components).toEqual({})
   })
 
   it('addSystem', () => {
@@ -78,31 +79,48 @@ describe('World Test', () => {
 
   it('addComponent', () => {
     const world = new World()
-    const returnWorld = world.addComponent(TestComponent)
 
-    expect(returnWorld).toEqual(world)
-    expect(world.testComponent).toEqual(TestComponent)
+    world.addComponent(TestComponent)
+    expect(world._components).toEqual({
+      testComponent: TestComponent
+    })
 
     const testComponent = new TestComponent()
     world.addComponent(testComponent)
-    expect(world.testComponent).toEqual(testComponent)
+    expect(world._components).toEqual({
+      testComponent
+    })
 
     world.addComponent('tag')
-    expect(world.tag).toBeTruthy()
+    expect(world._components).toEqual({
+      testComponent,
+      tag: true
+    })
 
     world.addComponent('key', 'value')
-    expect(world.key).toEqual('value')
+    expect(world._components).toEqual({
+      testComponent,
+      tag: true,
+      key: 'value'
+    })
   })
 
   it('removeComponent', () => {
     const world = new World()
     world.addComponent(TestComponent)
-    const returnWorld = world.removeComponent('TestComponent')
+    world.removeComponent('TestComponent')
 
-    expect(returnWorld).toEqual(world)
-    expect(world.testComponent).toBeUndefined()
+    expect(world._components).toEqual({})
 
     world.removeComponent('unexistComponent')
+  })
+
+  it('getComponent', () => {
+    const world = new World()
+    expect(world.getComponent('unExist')).toBeUndefined()
+
+    world.addComponent('key', 'value')
+    expect(world.getComponent('key')).toEqual('value')
   })
 
   it('addEntity', () => {
@@ -221,41 +239,34 @@ describe('World Test', () => {
 
   it('update', () => {
     const world = new World()
-    let systemUpdateCount = 0
-    System.update = (dt, now) => {
-      expect(dt).toEqual(16)
-      expect(now).toEqual(123)
-      ++systemUpdateCount
-    }
+    System.update = jest.fn()
     world.addSystem(System)
 
     // update when game isn't start
-    world.update(16, 123)
-    expect(systemUpdateCount).toEqual(0)
+    world.update()
+    expect(System.update).toHaveBeenCalledTimes(0)
 
     // update when game is running
     world.start()
     world.update(16, 123)
-    expect(systemUpdateCount).toEqual(1)
+    expect(System.update).toHaveBeenCalledWith(16, 123)
+    expect(System.update).toHaveBeenCalledTimes(1)
 
     // update when game is stopped
     world.stop()
-    world.update(16, 123)
-    expect(systemUpdateCount).toEqual(1)
+    world.update()
+    expect(System.update).toHaveBeenCalledTimes(1)
   })
 
   it('stop', () => {
     const world = new World()
-    TestSystem.stop = jest.fn()
     TestBackgroundSystem.stop = jest.fn()
-    world.addSystem(TestSystem)
     world.addBackgroundSystem(TestBackgroundSystem)
 
     world.start()
     world.stop()
 
     expect(world._runStatus).toBeFalsy()
-    expect(TestSystem.stop).toHaveBeenCalled()
     expect(TestBackgroundSystem.stop).toHaveBeenCalled()
   })
 
@@ -276,5 +287,6 @@ describe('World Test', () => {
     expect(world._systems).toEqual([])
     expect(world._backgroundSystems).toEqual([])
     expect(world._runStatus).toBeFalsy()
+    expect(world._components).toEqual({})
   })
 })

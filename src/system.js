@@ -1,15 +1,7 @@
-export default class System {
-  static addWorld(world) {
-    this._world = world
-  }
+import BaseSystem from './baseSystem'
 
-  static init() {}
-
+export default class System extends BaseSystem {
   static update() {
     throw 'System.update must be overwrited'
   }
-
-  static stop() {}
-
-  static destroy() {}
 }

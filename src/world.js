@@ -15,6 +15,8 @@ export default class World {
     this._backgroundSystems = []
 
     this._runStatus = false
+
+    this._components = {}
   }
 
   start() {
@@ -41,10 +43,6 @@ export default class World {
     this._backgroundSystems.forEach(system => {
       system.stop()
     })
-
-    this._systems.forEach(system => {
-      system.stop()
-    })
   }
 
   destroy() {
@@ -63,13 +61,15 @@ export default class World {
     const isComponent = typeof component !== 'string'
     const name = lowerCamelCase(isComponent ? getName(component) : component)
 
-    this[name] = isComponent ? component : (value !== undefined ? value : true)
-    return this
+    this._components[name] = isComponent ? component : (value !== undefined ? value : true)
   }
 
   removeComponent(name) {
-    delete this[lowerCamelCase(name)]
-    return this
+    delete this._components[lowerCamelCase(name)]
+  }
+
+  getComponent(name) {
+    return this._components[name]
   }
 
   // system
