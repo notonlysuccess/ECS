@@ -24,12 +24,6 @@ export default class BaseSystem {
 
   static destroy() {}
 
-  static restrict(options) {
-    options.remove && (this._restrictRemove = options.remove)
-    options.add && (this._restrictAdd = options.add)
-    options.get && (this._restrictGet = options.get)
-  }
-
   static removeComponent(name) {
     if (this._world === undefined) {
       throw `System did't add to world`
