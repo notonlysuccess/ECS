@@ -62,6 +62,7 @@ export default class World {
     const name = lowerCamelCase(isComponent ? getName(component) : component)
 
     this._components[name] = isComponent ? component : (value !== undefined ? value : true)
+    return this
   }
 
   removeComponent(name) {

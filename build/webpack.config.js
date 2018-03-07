@@ -5,6 +5,8 @@ module.exports = {
   output: {
     path: path.join(__dirname, '../dist'),
     filename: 'ECS.js',
+    library: 'ECS',
+    libraryTarget: 'umd'
   },
   module: {
     loaders: [
