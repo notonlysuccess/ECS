@@ -78,4 +78,16 @@ describe('BaseSystem test', () => {
     AddSystem.addComponent(testComponent)
     expect(world.addComponent).toHaveBeenLastCalledWith(testComponent, undefined)
   })
+
+  it('getEntities', () => {
+    const world = new World()
+    expect(() => {
+      BaseSystem.getEntities('c')
+    }).toThrowError(`System did't add to world`)
+
+    BaseSystem.addWorld(world)
+    world.getEntities = jest.fn()
+    BaseSystem.getEntities('a', 'b')
+    expect(world.getEntities).toHaveBeenCalledWith('a', 'b')
+  })
 })

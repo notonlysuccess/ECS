@@ -58,4 +58,12 @@ export default class BaseSystem {
     }
     this._world.addComponent(component, value)
   }
+
+  static getEntities() {
+    if (this._world === undefined) {
+      throw `System did't add to world`
+    }
+
+    return this._world.getEntities(...arguments)
+  }
 }
