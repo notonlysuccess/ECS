@@ -8,6 +8,7 @@ export default class BaseSystem {
   static _restrictRemove = []
   static _restrictAdd = []
   static _restrictGet = []
+  static _useStrict = false
 
   static addWorld(world) {
     this._world = world
@@ -42,8 +43,10 @@ export default class BaseSystem {
       throw `Restrict to get ${name}`
     }
     // before release, remove deepCopy function to improve performance
-    // return this._world.getComponent(name)
-    return deepCopy(this._world.getComponent(name))
+    if (this._useStrict) {
+      return deepCopy(this._world.getComponent(name))
+    }
+    return this._world.getComponent(name)
   }
 
   static addComponent(component, value) {

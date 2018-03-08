@@ -1,12 +1,16 @@
 import World from '../src/world'
 import BaseSystem from '../src/baseSystem'
 
-class TestComponent {}
+class TestComponent {
+  constructor(value) {
+    this.value = value
+  }
+}
 class RemoveSystem extends BaseSystem {
   static _restrictRemove = ['remove']
 }
 class GetSystem extends BaseSystem {
-  static _restrictGet = ['get']
+  static _restrictGet = ['get', 'testComponent']
 }
 class AddSystem extends BaseSystem {
   static _restrictAdd = ['add', 'testComponent']
@@ -55,8 +59,17 @@ describe('BaseSystem test', () => {
       GetSystem.getComponent('unexistComponent')
     }).toThrowError('Restrict to get unexistComponent')
 
-    world.addComponent('get', 123)
-    expect(GetSystem.getComponent('get')).toEqual(123)
+    const testComponent = new TestComponent(123)
+    world.addComponent(testComponent)
+    GetSystem._useStrict = true
+    let returnComponent = GetSystem.getComponent('testComponent')
+    returnComponent.value = 234
+    expect(testComponent.value).toEqual(123)
+
+    GetSystem._useStrict = false
+    returnComponent = GetSystem.getComponent('testComponent')
+    returnComponent.value = 234
+    expect(testComponent.value).toEqual(234)
   })
 
   it('addComponent', () => {
