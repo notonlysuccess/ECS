@@ -59,17 +59,17 @@ describe('BaseSystem test', () => {
       GetSystem.getComponent('unexistComponent')
     }).toThrowError('Restrict to get unexistComponent')
 
-    const testComponent = new TestComponent(123)
-    world.addComponent(testComponent)
+    const testComponent = {value: 1}
+    world.addComponent('testComponent', testComponent)
     GetSystem._useStrict = true
     let returnComponent = GetSystem.getComponent('testComponent')
-    returnComponent.value = 234
-    expect(testComponent.value).toEqual(123)
+    returnComponent.value = 2
+    expect(testComponent.value).toEqual(1)
 
     GetSystem._useStrict = false
     returnComponent = GetSystem.getComponent('testComponent')
-    returnComponent.value = 234
-    expect(testComponent.value).toEqual(234)
+    returnComponent.value = 2
+    expect(testComponent.value).toEqual(2)
   })
 
   it('addComponent', () => {

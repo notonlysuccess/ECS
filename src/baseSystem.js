@@ -1,8 +1,8 @@
 import {
   lowerCamelCase,
   getName,
-  deepCopy
 } from './utils'
+import deepCopy from 'deepcopy'
 
 export default class BaseSystem {
   static _restrictRemove = []

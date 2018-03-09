@@ -47,5 +47,8 @@
       "./test/*",
       "/node_modules/"
     ]
+  },
+  "dependencies": {
+    "deepcopy": "^0.6.3"
   }
 }

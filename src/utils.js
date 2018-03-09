@@ -9,15 +9,7 @@ const getName = component => {
   return component.constructor.name
 }
 
-const deepCopy = data => {
-  if (data === undefined) {
-    return undefined
-  }
-  return JSON.parse(JSON.stringify(data))
-}
-
 export {
   lowerCamelCase,
-  deepCopy,
   getName
 }
