@@ -124,7 +124,7 @@
     "max-nested-callbacks": [1, 3],
     "new-cap": [1, {"newIsCap": true, "capIsNew": true}],
     "new-parens": 1,
-    "newline-after-var": [1, "always"],
+    "newline-after-var": [0, "always"],
     "no-array-constructor": 1,
     "no-inline-comments": 0,
     "no-lonely-if": 1,

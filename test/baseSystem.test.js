@@ -1,5 +1,8 @@
 import World from '../src/world'
 import BaseSystem from '../src/baseSystem'
+import Entity from '../src/entity'
+
+BaseSystem._restrict = true
 
 class TestComponent {
   constructor(value) {
@@ -46,6 +49,7 @@ describe('BaseSystem test', () => {
     world.removeComponent = jest.fn()
     RemoveSystem.removeComponent('remove')
     expect(world.removeComponent).toHaveBeenCalledWith('remove')
+
   })
 
   it('getComponent', () => {
@@ -102,5 +106,42 @@ describe('BaseSystem test', () => {
     world.getEntities = jest.fn()
     BaseSystem.getEntities('a', 'b')
     expect(world.getEntities).toHaveBeenCalledWith('a', 'b')
+  })
+
+  it('getEntity', () => {
+    const world = new World()
+    expect(() => {
+      BaseSystem.getEntity('c')
+    }).toThrowError(`System did't add to world`)
+
+    BaseSystem.addWorld(world)
+    const entity = new Entity().addComponent('a')
+    world.addEntity(entity)
+    expect(BaseSystem.getEntity('a')).toEqual(entity)
+    expect(BaseSystem.getEntity('b')).toEqual(undefined)
+  })
+
+  it('addEntity', () => {
+    const world = new World()
+    expect(() => {
+      BaseSystem.addEntity('c')
+    }).toThrowError(`System did't add to world`)
+
+    BaseSystem.addWorld(world)
+    world.addEntity = jest.fn()
+    BaseSystem.addEntity('a')
+    expect(world.addEntity).toHaveBeenCalledWith('a')
+  })
+
+  it('removeEntity', () => {
+    const world = new World()
+    expect(() => {
+      BaseSystem.removeEntity('c')
+    }).toThrowError(`System did't add to world`)
+
+    BaseSystem.addWorld(world)
+    world.removeEntity = jest.fn()
+    BaseSystem.removeEntity('a')
+    expect(world.removeEntity).toHaveBeenCalledWith('a')
   })
 })
