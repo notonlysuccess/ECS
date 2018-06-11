@@ -26,6 +26,12 @@ export default class Entity {
     return this._world
   }
 
+  destroy() {
+    if (this._world) {
+      this._world.removeEntity(this)
+    }
+  }
+
   addToWorld(world) {
     this._world = world
     this._entityAddToWorldCb.forEach(cb => {

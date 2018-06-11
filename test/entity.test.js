@@ -275,4 +275,15 @@ describe('Entity Test', () => {
     expect(entity._entityAddToWorldCb.length).toEqual(0)
     expect(entity._entityRemoveFromWorldCb.length).toEqual(0)
   })
+
+  it('destroy', () => {
+    const entity = new Entity()
+    entity.destroy()
+
+    const world = new World()
+    world.addEntity(entity)
+    world.removeEntity = jest.fn()
+    entity.destroy()
+    expect(world.removeEntity).toHaveBeenCalledWith(entity)
+  })
 })

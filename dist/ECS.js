@@ -444,6 +444,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  _createClass(Entity, [{
+	    key: 'destroy',
+	    value: function destroy() {
+	      if (this._world) {
+	        this._world.removeEntity(this);
+	      }
+	    }
+	  }, {
 	    key: 'addToWorld',
 	    value: function addToWorld(world) {
 	      this._world = world;
@@ -737,19 +744,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'getEntity',
-	    value: function getEntity() {
-	      var _world2;
-
+	    value: function getEntity(entityId) {
 	      if (this._world === undefined) {
 	        console.error('System did\'t add to world');
 	        throw 'System did\'t add to world';
 	      }
 
-	      var entities = (_world2 = this._world).getEntities.apply(_world2, arguments);
-	      for (var key in entities) {
-	        return entities[key];
+	      return this._world.getEntity(entityId);
+	    }
+	  }, {
+	    key: 'addEntity',
+	    value: function addEntity(entity) {
+	      if (this._world === undefined) {
+	        console.error('System did\'t add to world');
+	        throw 'System did\'t add to world';
 	      }
-	      return undefined;
+
+	      this._world.addEntity(entity);
+	    }
+	  }, {
+	    key: 'removeEntity',
+	    value: function removeEntity(entity) {
+	      if (this._world === undefined) {
+	        console.error('System did\'t add to world');
+	        throw 'System did\'t add to world';
+	      }
+
+	      this._world.removeEntity(entity);
 	    }
 	  }]);
 

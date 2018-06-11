@@ -111,14 +111,15 @@ describe('BaseSystem test', () => {
   it('getEntity', () => {
     const world = new World()
     expect(() => {
-      BaseSystem.getEntity('c')
+      BaseSystem.getEntity(1)
     }).toThrowError(`System did't add to world`)
 
     BaseSystem.addWorld(world)
     const entity = new Entity().addComponent('a')
     world.addEntity(entity)
-    expect(BaseSystem.getEntity('a')).toEqual(entity)
-    expect(BaseSystem.getEntity('b')).toEqual(undefined)
+    const entityId = entity.id
+    expect(BaseSystem.getEntity(entityId)).toEqual(entity)
+    expect(BaseSystem.getEntity(-1)).toEqual(undefined)
   })
 
   it('addEntity', () => {

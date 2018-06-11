@@ -78,17 +78,13 @@ export default class BaseSystem {
     return this._world.getEntities(...arguments)
   }
 
-  static getEntity() {
+  static getEntity(entityId) {
     if (this._world === undefined) {
       console.error('System did\'t add to world')
       throw 'System did\'t add to world'
     }
 
-    const entities = this._world.getEntities(...arguments)
-    for (const key in entities) {
-      return entities[key]
-    }
-    return undefined
+    return this._world.getEntity(entityId)
   }
 
   static addEntity(entity) {
