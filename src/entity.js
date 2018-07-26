@@ -87,7 +87,7 @@ export default class Entity {
   addComponent(key, value) {
     const hasComponent = this.hasOwnProperty(key)
     this[key] && this._removeComponentLifeCycle(this[key])
-    this[key] = value || true
+    this[key] = value !== undefined ? value : true
     this[key] && this._addComponentLifeCycle(this[key])
 
     if (!hasComponent && this._world) {

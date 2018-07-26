@@ -54,7 +54,7 @@ export default class World {
 
   // components
   addComponent(key, value) {
-    this._components[key] = value || true
+    this._components[key] = value !== undefined ? value : true
     return this
   }
 
