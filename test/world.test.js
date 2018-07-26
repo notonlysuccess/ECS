@@ -80,26 +80,13 @@ describe('World Test', () => {
   it('addComponent', () => {
     const world = new World()
 
-    world.addComponent(TestComponent)
-    expect(world._components).toEqual({
-      testComponent: TestComponent
-    })
-
-    const testComponent = new TestComponent()
-    world.addComponent(testComponent)
-    expect(world._components).toEqual({
-      testComponent
-    })
-
     world.addComponent('tag')
     expect(world._components).toEqual({
-      testComponent,
       tag: true
     })
 
     world.addComponent('key', 'value')
     expect(world._components).toEqual({
-      testComponent,
       tag: true,
       key: 'value'
     })
@@ -107,8 +94,8 @@ describe('World Test', () => {
 
   it('removeComponent', () => {
     const world = new World()
-    world.addComponent(TestComponent)
-    world.removeComponent('TestComponent')
+    world.addComponent('testComponent', TestComponent)
+    world.removeComponent('testComponent')
 
     expect(world._components).toEqual({})
 
@@ -210,11 +197,11 @@ describe('World Test', () => {
     })
     expect(world._tuples['component1']).toEqual(tuple1)
 
-    const tuple2 = world._ensureTupleExists(getArguments('component1', 'Component2'))
+    const tuple2 = world._ensureTupleExists(getArguments('component1', 'component2'))
     expect(tuple2.entities).toEqual({
       [entity2.id]: entity2
     })
-    expect(world._tuples['component1,Component2']).toEqual(tuple2)
+    expect(world._tuples['component1,component2']).toEqual(tuple2)
 
     const tuple3 = world._ensureTupleExists(getArguments('unexistComponent'))
     expect(tuple3.entities).toEqual({})

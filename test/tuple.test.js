@@ -44,7 +44,7 @@ describe('Tuple Test', () => {
     entity2.addComponent('key2')
 
     tuple.addEntityIfMatch(entity1)
-    expect(tuple._entities[entity1.id]).toBeUndefined
+    expect(tuple._entities[entity1.id]).toBeUndefined()
 
     const returnTuple = tuple.addEntityIfMatch(entity2)
     expect(tuple._entities[entity2.id]).toEqual(entity2)
@@ -59,7 +59,7 @@ describe('Tuple Test', () => {
     expect(tuple._entities[entity.id]).toEqual(entity)
 
     const returnTuple = tuple.removeEntity(entity)
-    expect(tuple._entities[entity.id]).toBeUndefined
+    expect(tuple._entities[entity.id]).toBeUndefined()
     expect(returnTuple).toEqual(tuple)
 
     const entity2 = new Entity()
@@ -75,7 +75,7 @@ describe('Tuple Test', () => {
 
     entity.removeComponent('key1')
     const returnTuple = tuple.removeEntityIfNotMatch(entity)
-    expect(tuple._entities[entity.id]).toBeUndefined
+    expect(tuple._entities[entity.id]).toBeUndefined()
     expect(returnTuple).toEqual(tuple)
 
     const entity2 = new Entity()

@@ -9,15 +9,6 @@ class TestComponent {
     this.value = value
   }
 }
-class RemoveSystem extends BaseSystem {
-  static _restrictRemove = ['remove']
-}
-class GetSystem extends BaseSystem {
-  static _restrictGet = ['get', 'testComponent']
-}
-class AddSystem extends BaseSystem {
-  static _restrictAdd = ['add', 'testComponent']
-}
 
 describe('BaseSystem test', () => {
   beforeEach(() => {
@@ -38,16 +29,13 @@ describe('BaseSystem test', () => {
   it('removeComponent', () => {
     const world = new World()
     expect(() => {
-      RemoveSystem.removeComponent('c')
+      BaseSystem.removeComponent('c')
     }).toThrowError(`System did't add to world`)
 
-    RemoveSystem.addWorld(world)
-    expect(() => {
-      RemoveSystem.removeComponent('unexistComponent')
-    }).toThrowError('Restrict to remove unexistComponent')
+    BaseSystem.addWorld(world)
 
     world.removeComponent = jest.fn()
-    RemoveSystem.removeComponent('remove')
+    BaseSystem.removeComponent('remove')
     expect(world.removeComponent).toHaveBeenCalledWith('remove')
 
   })
@@ -55,44 +43,31 @@ describe('BaseSystem test', () => {
   it('getComponent', () => {
     const world = new World()
     expect(() => {
-      GetSystem.getComponent('c')
+      BaseSystem.getComponent('c')
     }).toThrowError(`System did't add to world`)
 
-    GetSystem.addWorld(world)
-    expect(() => {
-      GetSystem.getComponent('unexistComponent')
-    }).toThrowError('Restrict to get unexistComponent')
+    BaseSystem.addWorld(world)
 
-    const testComponent = new TestComponent(123)
-    world.addComponent(testComponent)
-    GetSystem._useStrict = true
-    let returnComponent = GetSystem.getComponent('testComponent')
-    returnComponent.value = 234
-    expect(testComponent.value).toEqual(123)
+    expect(BaseSystem.getComponent('c')).toBeUndefined()
 
-    GetSystem._useStrict = false
-    returnComponent = GetSystem.getComponent('testComponent')
-    returnComponent.value = 234
-    expect(testComponent.value).toEqual(234)
+    world.addComponent('test', 123)
+    expect(BaseSystem.getComponent('test')).toEqual(123)
   })
 
   it('addComponent', () => {
     const world = new World()
     expect(() => {
-      AddSystem.addComponent('c')
+      BaseSystem.addComponent('c')
     }).toThrowError(`System did't add to world`)
 
-    AddSystem.addWorld(world)
-    expect(() => {
-      AddSystem.addComponent('unexistComponent')
-    }).toThrowError('Restrict to add unexistComponent')
+    BaseSystem.addWorld(world)
 
     world.addComponent = jest.fn()
-    AddSystem.addComponent('add', 123)
+    BaseSystem.addComponent('add', 123)
     expect(world.addComponent).toHaveBeenCalledWith('add', 123)
 
     const testComponent = new TestComponent()
-    AddSystem.addComponent(testComponent)
+    BaseSystem.addComponent(testComponent)
     expect(world.addComponent).toHaveBeenLastCalledWith(testComponent, undefined)
   })
 

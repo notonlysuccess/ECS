@@ -1,8 +1,3 @@
-import {
-  lowerCamelCase,
-  getName
-} from './utils'
-
 let entityId = 0
 
 export default class Entity {
@@ -78,7 +73,7 @@ export default class Entity {
 
   has() {
     for (const i in arguments) {
-      if (!this.hasOwnProperty(lowerCamelCase(arguments[i]))) {
+      if (!this.hasOwnProperty(arguments[i])) {
         return false
       }
     }
@@ -86,22 +81,14 @@ export default class Entity {
   }
 
   /**
-   * component
    * tag
    * key, value
    */
-  addComponent(component, value) {
-    const isComponent = typeof component !== 'string'
-    const name = lowerCamelCase(isComponent ? getName(component) : component)
-    const hasComponent = this.hasOwnProperty(name)
-
-    if (hasComponent && isComponent) {
-      this._removeComponentLifeCycle(this[name])
-    }
-    this[name] = isComponent ? component : (value !== undefined ? value : true)
-    if (isComponent) {
-      this._addComponentLifeCycle(this[name])
-    }
+  addComponent(key, value) {
+    const hasComponent = this.hasOwnProperty(key)
+    this[key] && this._removeComponentLifeCycle(this[key])
+    this[key] = value || true
+    this[key] && this._addComponentLifeCycle(this[key])
 
     if (!hasComponent && this._world) {
       this._world.addEntityToTuples(this)
@@ -110,7 +97,6 @@ export default class Entity {
   }
 
   removeComponent(name) {
-    name = lowerCamelCase(name)
     if (this.hasOwnProperty(name)) {
       this._removeComponentLifeCycle(this[name])
       delete this[name]

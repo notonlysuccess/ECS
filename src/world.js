@@ -1,8 +1,4 @@
 import Tuple from './tuple'
-import {
-  lowerCamelCase,
-  getName
-} from './utils'
 
 export default class World {
   constructor() {
@@ -57,16 +53,13 @@ export default class World {
   }
 
   // components
-  addComponent(component, value) {
-    const isComponent = typeof component !== 'string'
-    const name = lowerCamelCase(isComponent ? getName(component) : component)
-
-    this._components[name] = isComponent ? component : (value !== undefined ? value : true)
+  addComponent(key, value) {
+    this._components[key] = value || true
     return this
   }
 
   removeComponent(name) {
-    delete this._components[lowerCamelCase(name)]
+    delete this._components[name]
   }
 
   getComponent(name) {

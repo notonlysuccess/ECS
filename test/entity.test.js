@@ -2,8 +2,6 @@ import Entity from '../src/entity'
 import World from '../src/world'
 
 class Component1 {
-  static sValue = 'test1'
-
   constructor(value) {
     this.value = value
   }
@@ -109,18 +107,10 @@ describe('Entity Test', () => {
     expect(returnEntity.id).toEqual(entity.id)
   })
 
-  it('addComponent with Component', () => {
-    const entity = new Entity()
-    entity.addComponent(Component1)
-    entity.addComponent(new Component2('test2'))
-    expect(entity.component1.sValue).toEqual('test1')
-    expect(entity.component2.value).toEqual('test2')
-  })
-
   it('addComponent with tag', () => {
     const entity = new Entity()
-    entity.addComponent('OneTag')
-    entity.addComponent('Tag2')
+    entity.addComponent('oneTag')
+    entity.addComponent('tag2')
     entity.addComponent('tag3')
     expect(entity.oneTag).toBeTruthy()
     expect(entity.tag2).toBeTruthy()
@@ -139,44 +129,19 @@ describe('Entity Test', () => {
   it('addComponent: inner function', () => {
     const world = new World()
     const entity = new Entity()
-    const component1 = new Component1('c1test')
-    const component2 = new Component2('c2test')
     entity._addComponentLifeCycle = jest.fn()
     entity._removeComponentLifeCycle = jest.fn()
     world.addEntityToTuples = jest.fn()
+    entity._world = world
     // add first component(tag)
     entity.addComponent('tag')
-    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(0)
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(0)
-    expect(world.addEntityToTuples).toHaveBeenCalledTimes(0)
-    // add second component(component)
-    entity.addComponent(component1)
     expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(1)
-    expect(entity._addComponentLifeCycle).toHaveBeenCalledWith(component1)
     expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(0)
-    expect(world.addEntityToTuples).toHaveBeenCalledTimes(0)
-    // add same component(component)
-    entity.addComponent(component1)
-    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(2)
-    expect(entity._addComponentLifeCycle).toHaveBeenCalledWith(component1)
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(1)
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(component1)
-    expect(world.addEntityToTuples).toHaveBeenCalledTimes(0)
-    // add entity to world
-    entity.addToWorld(world)
-    // add third component(component)
-    entity.addComponent(component2)
-    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(3)
-    expect(entity._addComponentLifeCycle).toHaveBeenCalledWith(component2)
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(1)
     expect(world.addEntityToTuples).toHaveBeenCalledTimes(1)
-    expect(world.addEntityToTuples).toHaveBeenCalledWith(entity)
-    // add some component(component)
-    entity.addComponent(component2)
-    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(4)
-    expect(entity._addComponentLifeCycle).toHaveBeenCalledWith(component2)
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(2)
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(component2)
+
+    entity.addComponent('tag')
+    expect(entity._addComponentLifeCycle).toHaveBeenCalledTimes(2)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(1)
     expect(world.addEntityToTuples).toHaveBeenCalledTimes(1)
   })
 
@@ -208,28 +173,20 @@ describe('Entity Test', () => {
     // add components
     const component1 = Component1
     const component2 = new Component2('test')
-    entity.addComponent(component1)
-    entity.addComponent(component2)
-    entity.addComponent('tag')
-    // remove first component
-    entity.removeComponent('component1')
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(1)
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(component1)
-    expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(0)
-    // remove second component
-    entity.removeComponent('component2')
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(2)
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(component2)
-    expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(0)
-    // remove some component
-    entity.removeComponent('component2')
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(2)
-    expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(0)
-    // add to world then remove the remain two components
-    entity.addToWorld(world)
-    // remove third component
     entity.removeComponent('tag')
-    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(3)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(0)
+    expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(0)
+
+    entity.addComponent('tag')
+    entity.removeComponent('tag')
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(1)
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(true)
+    expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(0)
+
+    entity._world = world
+    entity.addComponent('tag')
+    entity.removeComponent('tag')
+    expect(entity._removeComponentLifeCycle).toHaveBeenCalledTimes(2)
     expect(entity._removeComponentLifeCycle).toHaveBeenCalledWith(true)
     expect(world.removeEntityFromTuples).toHaveBeenCalledTimes(1)
     expect(world.removeEntityFromTuples).toHaveBeenCalledWith(entity)
@@ -237,11 +194,11 @@ describe('Entity Test', () => {
 
   it('has', () => {
     const entity = new Entity()
-    entity.addComponent('OneTag')
-    entity.addComponent('Tag2')
+    entity.addComponent('oneTag')
+    entity.addComponent('tag2')
     entity.addComponent('tag3')
     expect(entity.has('oneTag', 'tag2')).toBeTruthy()
-    expect(entity.has('oneTag', 'tag2', 'Tag3')).toBeTruthy()
+    expect(entity.has('oneTag', 'tag2', 'tag3')).toBeTruthy()
     expect(entity.has('otherTag')).toBeFalsy()
   })
 
