@@ -65,15 +65,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _world2 = _interopRequireDefault(_world);
 
-	var _entity = __webpack_require__(4);
+	var _entity = __webpack_require__(3);
 
 	var _entity2 = _interopRequireDefault(_entity);
 
-	var _system = __webpack_require__(5);
+	var _system = __webpack_require__(4);
 
 	var _system2 = _interopRequireDefault(_system);
 
-	var _backgroundSystem = __webpack_require__(7);
+	var _backgroundSystem = __webpack_require__(6);
 
 	var _backgroundSystem2 = _interopRequireDefault(_backgroundSystem);
 
@@ -99,8 +99,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _tuple = __webpack_require__(2);
 
 	var _tuple2 = _interopRequireDefault(_tuple);
-
-	var _utils = __webpack_require__(3);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -176,17 +174,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  }, {
 	    key: 'addComponent',
-	    value: function addComponent(component, value) {
-	      var isComponent = typeof component !== 'string';
-	      var name = (0, _utils.lowerCamelCase)(isComponent ? (0, _utils.getName)(component) : component);
-
-	      this._components[name] = isComponent ? component : value !== undefined ? value : true;
+	    value: function addComponent(key, value) {
+	      this._components[key] = value || true;
 	      return this;
 	    }
 	  }, {
 	    key: 'removeComponent',
 	    value: function removeComponent(name) {
-	      delete this._components[(0, _utils.lowerCamelCase)(name)];
+	      delete this._components[name];
 	    }
 	  }, {
 	    key: 'getComponent',
@@ -383,46 +378,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ (function(module, exports) {
 
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var lowerCamelCase = function lowerCamelCase(name) {
-	  return name[0].toLowerCase() + name.slice(1);
-	};
-
-	var getName = function getName(component) {
-	  if (typeof component === 'function') {
-	    return component.name;
-	  }
-	  return component.constructor.name;
-	};
-
-	var deepCopy = function deepCopy(data) {
-	  if (data === undefined) {
-	    return undefined;
-	  }
-	  return JSON.parse(JSON.stringify(data));
-	};
-
-	exports.lowerCamelCase = lowerCamelCase;
-	exports.deepCopy = deepCopy;
-	exports.getName = getName;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _utils = __webpack_require__(3);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -444,14 +406,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  _createClass(Entity, [{
-	    key: 'destroy',
+	    key: "destroy",
 	    value: function destroy() {
 	      if (this._world) {
 	        this._world.removeEntity(this);
 	      }
 	    }
 	  }, {
-	    key: 'addToWorld',
+	    key: "addToWorld",
 	    value: function addToWorld(world) {
 	      this._world = world;
 	      this._entityAddToWorldCb.forEach(function (cb) {
@@ -459,7 +421,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    }
 	  }, {
-	    key: 'removeFromWorld',
+	    key: "removeFromWorld",
 	    value: function removeFromWorld() {
 	      this._entityRemoveFromWorldCb.forEach(function (cb) {
 	        cb();
@@ -467,19 +429,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._world = undefined;
 	    }
 	  }, {
-	    key: 'insertAddToWorldCb',
+	    key: "insertAddToWorldCb",
 	    value: function insertAddToWorldCb(cb) {
 	      this._entityAddToWorldCb.push(cb);
 	      return this;
 	    }
 	  }, {
-	    key: 'insertRemoveFromWorldCb',
+	    key: "insertRemoveFromWorldCb",
 	    value: function insertRemoveFromWorldCb(cb) {
 	      this._entityRemoveFromWorldCb.push(cb);
 	      return this;
 	    }
 	  }, {
-	    key: 'deleteRemoveFromWorldCb',
+	    key: "deleteRemoveFromWorldCb",
 	    value: function deleteRemoveFromWorldCb(cb) {
 	      for (var i = this._entityRemoveFromWorldCb.length - 1; i >= 0; i--) {
 	        if (cb === this._entityRemoveFromWorldCb[i]) {
@@ -490,7 +452,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    }
 	  }, {
-	    key: 'deleteAddToWorldCb',
+	    key: "deleteAddToWorldCb",
 	    value: function deleteAddToWorldCb(cb) {
 	      for (var i = this._entityAddToWorldCb.length - 1; i >= 0; i--) {
 	        if (cb === this._entityAddToWorldCb[i]) {
@@ -501,10 +463,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    }
 	  }, {
-	    key: 'has',
+	    key: "has",
 	    value: function has() {
 	      for (var i in arguments) {
-	        if (!this.hasOwnProperty((0, _utils.lowerCamelCase)(arguments[i]))) {
+	        if (!this.hasOwnProperty(arguments[i])) {
 	          return false;
 	        }
 	      }
@@ -512,25 +474,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * component
 	     * tag
 	     * key, value
 	     */
 
 	  }, {
-	    key: 'addComponent',
-	    value: function addComponent(component, value) {
-	      var isComponent = typeof component !== 'string';
-	      var name = (0, _utils.lowerCamelCase)(isComponent ? (0, _utils.getName)(component) : component);
-	      var hasComponent = this.hasOwnProperty(name);
-
-	      if (hasComponent && isComponent) {
-	        this._removeComponentLifeCycle(this[name]);
-	      }
-	      this[name] = isComponent ? component : value !== undefined ? value : true;
-	      if (isComponent) {
-	        this._addComponentLifeCycle(this[name]);
-	      }
+	    key: "addComponent",
+	    value: function addComponent(key, value) {
+	      var hasComponent = this.hasOwnProperty(key);
+	      this[key] && this._removeComponentLifeCycle(this[key]);
+	      this[key] = value || true;
+	      this[key] && this._addComponentLifeCycle(this[key]);
 
 	      if (!hasComponent && this._world) {
 	        this._world.addEntityToTuples(this);
@@ -538,9 +492,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    }
 	  }, {
-	    key: 'removeComponent',
+	    key: "removeComponent",
 	    value: function removeComponent(name) {
-	      name = (0, _utils.lowerCamelCase)(name);
 	      if (this.hasOwnProperty(name)) {
 	        this._removeComponentLifeCycle(this[name]);
 	        delete this[name];
@@ -551,7 +504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    }
 	  }, {
-	    key: '_addComponentLifeCycle',
+	    key: "_addComponentLifeCycle",
 	    value: function _addComponentLifeCycle(component) {
 	      if (component.addToEntityCb) {
 	        // it will be called when component added to entity
@@ -568,7 +521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    }
 	  }, {
-	    key: '_removeComponentLifeCycle',
+	    key: "_removeComponentLifeCycle",
 	    value: function _removeComponentLifeCycle(component) {
 	      if (component.entityAddToWorldCb) {
 	        this.deleteAddToWorldCb(component.entityAddToWorldCb);
@@ -583,12 +536,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    }
 	  }, {
-	    key: 'id',
+	    key: "id",
 	    get: function get() {
 	      return this._id;
 	    }
 	  }, {
-	    key: 'world',
+	    key: "world",
 	    get: function get() {
 	      return this._world;
 	    }
@@ -600,7 +553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Entity;
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -611,7 +564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _baseSystem = __webpack_require__(6);
+	var _baseSystem = __webpack_require__(5);
 
 	var _baseSystem2 = _interopRequireDefault(_baseSystem);
 
@@ -645,8 +598,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = System;
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 5 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -655,8 +608,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _utils = __webpack_require__(3);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -685,91 +636,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'destroy',
 	    value: function destroy() {}
 	  }, {
-	    key: 'removeComponent',
-	    value: function removeComponent(name) {
+	    key: '_checkWorld',
+	    value: function _checkWorld() {
 	      if (this._world === undefined) {
 	        console.error('System did\'t add to world');
 	        throw 'System did\'t add to world';
 	      }
-	      if (this._restrict && this._restrictRemove.indexOf(name) === -1) {
-	        console.log('Restrict to remove ' + name);
-	        throw 'Restrict to remove ' + name;
-	      }
+	    }
+	  }, {
+	    key: 'removeComponent',
+	    value: function removeComponent(name) {
+	      this._checkWorld();
 	      this._world.removeComponent(name);
 	    }
 	  }, {
 	    key: 'getComponent',
 	    value: function getComponent(name) {
-	      if (this._world === undefined) {
-	        console.error('System did\'t add to world');
-	        throw 'System did\'t add to world';
-	      }
-	      if (this._restrict && this._restrictGet.indexOf(name) === -1) {
-	        console.log('Restrict to get ' + name);
-	        throw 'Restrict to get ' + name;
-	      }
-	      // before release, remove deepCopy function to improve performance
-	      if (this._useStrict) {
-	        return (0, _utils.deepCopy)(this._world.getComponent(name));
-	      }
+	      this._checkWorld();
 	      return this._world.getComponent(name);
 	    }
 	  }, {
 	    key: 'addComponent',
-	    value: function addComponent(component, value) {
-	      if (this._world === undefined) {
-	        console.error('System did\'t add to world');
-	        throw 'System did\'t add to world';
-	      }
-	      var isComponent = typeof component !== 'string';
-	      var name = (0, _utils.lowerCamelCase)(isComponent ? (0, _utils.getName)(component) : component);
-
-	      if (this._restrict && this._restrictAdd.indexOf(name) === -1) {
-	        console.log('Restrict to add ' + name);
-	        throw 'Restrict to add ' + name;
-	      }
-	      this._world.addComponent(component, value);
+	    value: function addComponent(key, value) {
+	      this._checkWorld();
+	      this._world.addComponent(key, value);
 	    }
 	  }, {
 	    key: 'getEntities',
 	    value: function getEntities() {
 	      var _world;
 
-	      if (this._world === undefined) {
-	        console.error('System did\'t add to world');
-	        throw 'System did\'t add to world';
-	      }
-
+	      this._checkWorld();
 	      return (_world = this._world).getEntities.apply(_world, arguments);
 	    }
 	  }, {
 	    key: 'getEntity',
 	    value: function getEntity(entityId) {
-	      if (this._world === undefined) {
-	        console.error('System did\'t add to world');
-	        throw 'System did\'t add to world';
-	      }
-
+	      this._checkWorld();
 	      return this._world.getEntity(entityId);
 	    }
 	  }, {
 	    key: 'addEntity',
 	    value: function addEntity(entity) {
-	      if (this._world === undefined) {
-	        console.error('System did\'t add to world');
-	        throw 'System did\'t add to world';
-	      }
-
+	      this._checkWorld();
 	      this._world.addEntity(entity);
 	    }
 	  }, {
 	    key: 'removeEntity',
 	    value: function removeEntity(entity) {
-	      if (this._world === undefined) {
-	        console.error('System did\'t add to world');
-	        throw 'System did\'t add to world';
-	      }
-
+	      this._checkWorld();
 	      this._world.removeEntity(entity);
 	    }
 	  }]);
@@ -785,7 +700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = BaseSystem;
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -796,7 +711,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _baseSystem = __webpack_require__(6);
+	var _baseSystem = __webpack_require__(5);
 
 	var _baseSystem2 = _interopRequireDefault(_baseSystem);
 

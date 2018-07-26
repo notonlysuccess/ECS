@@ -92,7 +92,7 @@
     "no-self-compare": 2,
     "no-sequences": 2,
     "no-throw-literal": 0,
-    "no-unused-expressions": 2,
+    "no-unused-expressions": [2, {"allowShortCircuit": true}],
     "no-useless-call": 1,
     "no-useless-concat": 2,
     "no-void": 2,
