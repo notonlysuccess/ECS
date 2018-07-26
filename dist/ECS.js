@@ -175,7 +175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'addComponent',
 	    value: function addComponent(key, value) {
-	      this._components[key] = value || true;
+	      this._components[key] = value !== undefined ? value : true;
 	      return this;
 	    }
 	  }, {
@@ -483,7 +483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function addComponent(key, value) {
 	      var hasComponent = this.hasOwnProperty(key);
 	      this[key] && this._removeComponentLifeCycle(this[key]);
-	      this[key] = value || true;
+	      this[key] = value !== undefined ? value : true;
 	      this[key] && this._addComponentLifeCycle(this[key]);
 
 	      if (!hasComponent && this._world) {
