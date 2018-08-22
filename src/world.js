@@ -50,6 +50,7 @@ export default class World {
     this._systems = []
     this._backgroundSystems = []
     this._runStatus = false
+    this._components = {}
   }
 
   // components
@@ -123,6 +124,16 @@ export default class World {
     const tuple = this._ensureTupleExists(arguments)
 
     return tuple.entities
+  }
+
+  getEntitiesList() {
+    const entities = this.getEntities(...arguments)
+
+    const entitiesList = []
+    for (const name in entities) {
+      entitiesList.push(entities[name])
+    }
+    return entitiesList
   }
 
   getEntity(entityId) {
