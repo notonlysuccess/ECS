@@ -315,6 +315,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return tuple.entities;
 	    }
 	  }, {
+	    key: 'getEntitiesList',
+	    value: function getEntitiesList() {
+	      var entities = this.getEntities.apply(this, arguments);
+	      var list = [];
+	      for (var name in entities) {
+	        list.push(entities[name]);
+	      }
+	      return list;
+	    }
+	  }, {
 	    key: 'getEntity',
 	    value: function getEntity(entityId) {
 	      return this._tuples[''].entities[entityId];
@@ -722,6 +732,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this._checkWorld();
 	      return (_world = this._world).getEntities.apply(_world, arguments);
+	    }
+	  }, {
+	    key: 'getEntitiesList',
+	    value: function getEntitiesList() {
+	      var _world2;
+
+	      this._checkWorld();
+	      return (_world2 = this._world).getEntitiesList.apply(_world2, arguments);
 	    }
 	  }, {
 	    key: 'getEntity',

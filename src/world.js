@@ -176,6 +176,15 @@ export default class World {
     return tuple.entities
   }
 
+  getEntitiesList(...args) {
+    const entities = this.getEntities(...args)
+    const list = []
+    for (const name in entities) {
+      list.push(entities[name])
+    }
+    return list
+  }
+
   getEntity(entityId) {
     return this._tuples[''].entities[entityId]
   }

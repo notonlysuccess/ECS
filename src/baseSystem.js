@@ -47,6 +47,11 @@ export default class BaseSystem {
     return this._world.getEntities(...arguments)
   }
 
+  static getEntitiesList() {
+    this._checkWorld()
+    return this._world.getEntitiesList(...arguments)
+  }
+
   static getEntity(entityId) {
     this._checkWorld()
     return this._world.getEntity(entityId)
