@@ -1,5 +1,9 @@
 import Tuple from './tuple'
 
+const OUTPUT_INTERVAL = 5000
+const WARNING = 'color: red;'
+const NORMAL = 'color: black;'
+
 export default class World {
   constructor() {
     this._tuples = {
@@ -13,6 +17,20 @@ export default class World {
     this._runStatus = false
 
     this._components = {}
+
+    this._benchMark = false
+    this._totalTime = {
+      total: 0
+    }
+    this._maxTime = {
+      total: 0
+    }
+    this._benchMarkIndex = 0
+    this._maxSystemNameLength = 0
+  }
+
+  openBenchMark() {
+    this._benchMark = true
   }
 
   start() {
@@ -22,16 +40,43 @@ export default class World {
       })
     }
     this._runStatus = true
+
+    if (this._benchMark) {
+      this._benchMarkInterval = setInterval(() => {
+        console.log('---------------')
+        console.log('benchmark ' + this._benchMarkIndex++ + ' time:')
+        for (const name in this._totalTime) {
+          const average = (this._totalTime[name] * 1000 / (this._benchMarkIndex * OUTPUT_INTERVAL * 16)).toFixed(2)
+          console.log(`${name.padEnd(this._maxSystemNameLength, ' ')} %c [maxTime: ${String(this._maxTime[name]).padStart(3, ' ')}ms] %c [average: ${String(average).padStart(5, ' ')}ms] [totalTime: ${this._totalTime[name]}ms]`, this._maxTime[name] > 10 ? WARNING : NORMAL, average > 3 ? WARNING : NORMAL)
+        }
+      }, OUTPUT_INTERVAL)
+    }
   }
 
   update() {
+    if (this._benchMark) {
+      this._updateStartTime = Date.now()
+    }
     this._systems.forEach(system => {
       if (!this._runStatus) {
         return
       }
-      // usually arguments is dt(delta time of this update and last update) and now(the current time)
-      system.update.apply(system, arguments)
+      if (this._benchMark) {
+        const s = Date.now()
+        system.update.apply(system, arguments)
+        const cost = Date.now() - s
+        this._maxTime[system.name] = Math.max(this._maxTime[system.name], cost)
+        this._totalTime[system.name] += cost
+      } else {
+        // usually arguments is dt(delta time of this update and last update) and now(the current time)
+        system.update.apply(system, arguments)
+      }
     })
+    if (this._benchMark) {
+      const cost = Date.now() - this._updateStartTime
+      this._maxTime.total = Math.max(this._maxTime.total, cost)
+      this._totalTime.total += cost
+    }
   }
 
   stop() {
@@ -42,6 +87,7 @@ export default class World {
   }
 
   destroy() {
+    this._benchMarkInterval && clearInterval(this._benchMarkInterval)
     this._tuples = {
       '': new Tuple([])
     }
@@ -68,6 +114,11 @@ export default class World {
 
   // system
   addSystem(system) {
+    if (this._benchMark) {
+      this._maxSystemNameLength = Math.max(this._maxSystemNameLength, system.name.length)
+      this._totalTime[system.name] = 0
+      this._maxTime[system.name] = 0
+    }
     this._systems.push(system)
     system.addWorld(this)
     system.init()
@@ -104,10 +155,10 @@ export default class World {
 
   // entity
   addEntity(entity) {
-    entity.addToWorld(this)
     for (const name in this._tuples) {
       this._tuples[name].addEntityIfMatch(entity)
     }
+    entity.addToWorld(this)
     return this
   }
 
