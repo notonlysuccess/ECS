@@ -21,6 +21,10 @@ export default class Entity {
     return this._world
   }
 
+  inWorld() {
+    return this._world === undefined
+  }
+
   destroy() {
     if (this._world) {
       this._world.removeEntity(this)

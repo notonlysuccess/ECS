@@ -204,7 +204,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
-	      this._benchMarkInterval && clearInterval(this._benchMarkInterval);
+	      if (this._benchMarkInterval) {
+	        clearInterval(this._benchMarkInterval);
+	        for (var i in this._totalTime) {
+	          this._totalTime[i] = 0;
+	        }
+	        for (var _i in this._maxTime) {
+	          this._maxTime[_i] = 0;
+	        }
+	        this._benchMarkIndex = 0;
+	      }
 	      this._tuples = {
 	        '': new _tuple2.default([])
 	      };
@@ -470,6 +479,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  _createClass(Entity, [{
+	    key: "inWorld",
+	    value: function inWorld() {
+	      return this._world === undefined;
+	    }
+	  }, {
 	    key: "destroy",
 	    value: function destroy() {
 	      if (this._world) {

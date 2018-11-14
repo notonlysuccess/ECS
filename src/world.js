@@ -87,7 +87,16 @@ export default class World {
   }
 
   destroy() {
-    this._benchMarkInterval && clearInterval(this._benchMarkInterval)
+    if (this._benchMarkInterval) {
+      clearInterval(this._benchMarkInterval)
+      for (const i in this._totalTime) {
+        this._totalTime[i] = 0
+      }
+      for (const i in this._maxTime) {
+        this._maxTime[i] = 0
+      }
+      this._benchMarkIndex = 0
+    }
     this._tuples = {
       '': new Tuple([])
     }
