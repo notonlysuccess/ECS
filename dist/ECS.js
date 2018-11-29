@@ -104,6 +104,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var OUTPUT_INTERVAL = 5000;
+	var WARNING = 'color: red;';
+	var NORMAL = 'color: black;';
+
 	var World = function () {
 	  function World() {
 	    _classCallCheck(this, World);
@@ -119,30 +123,87 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._runStatus = false;
 
 	    this._components = {};
+
+	    this._benchMark = false;
+	    this._totalTime = {
+	      total: 0
+	    };
+	    this._maxTime = {
+	      total: 0
+	    };
+	    this._benchMarkIndex = 0;
+	    this._maxSystemNameLength = 0;
 	  }
 
 	  _createClass(World, [{
+	    key: 'openBenchMark',
+	    value: function openBenchMark() {
+	      this._benchMark = true;
+	    }
+	  }, {
 	    key: 'start',
 	    value: function start() {
+	      var _this = this;
+
 	      if (!this._runStatus) {
 	        this._backgroundSystems.forEach(function (system) {
 	          system.start();
 	        });
 	      }
 	      this._runStatus = true;
+
+	      if (this._benchMark) {
+	        this._benchMarkInterval = setInterval(function () {
+	          console.log('---------------');
+	          console.log('benchmark ' + _this._benchMarkIndex++ + ' time:');
+	          for (var name in _this._totalTime) {
+	            var average = (_this._totalTime[name] * 1000 / (_this._benchMarkIndex * OUTPUT_INTERVAL * 16)).toFixed(2);
+	            console.log(name.padEnd(_this._maxSystemNameLength, ' ') + ' %c [maxTime: ' + String(_this._maxTime[name]).padStart(3, ' ') + 'ms] %c [average: ' + String(average).padStart(5, ' ') + 'ms] [totalTime: ' + _this._totalTime[name] + 'ms]', _this._maxTime[name] > 10 ? WARNING : NORMAL, average > 3 ? WARNING : NORMAL);
+	          }
+	        }, OUTPUT_INTERVAL);
+	      }
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      var _this = this,
+	      var _this2 = this,
 	          _arguments = arguments;
 
+	      if (this._benchMark) {
+	        this._updateStartTime = Date.now();
+	      }
 	      this._systems.forEach(function (system) {
-	        if (!_this._runStatus) {
+	        if (!_this2._runStatus) {
 	          return;
 	        }
-	        // usually arguments is dt(delta time of this update and last update) and now(the current time)
-	        system.update.apply(system, _arguments);
+	        if (_this2._benchMark) {
+	          var s = Date.now();
+	          system.update && system.update.apply(system, _arguments);
+	          var cost = Date.now() - s;
+	          _this2._maxTime[system.name] = Math.max(_this2._maxTime[system.name], cost);
+	          _this2._totalTime[system.name] += cost;
+	        } else {
+	          // usually arguments is dt(delta time of this update and last update) and now(the current time)
+	          system.update && system.update.apply(system, _arguments);
+	        }
+	      });
+	      if (this._benchMark) {
+	        var cost = Date.now() - this._updateStartTime;
+	        this._maxTime.total = Math.max(this._maxTime.total, cost);
+	        this._totalTime.total += cost;
+	      }
+	    }
+	  }, {
+	    key: 'predictUpdate',
+	    value: function predictUpdate() {
+	      var _this3 = this,
+	          _arguments2 = arguments;
+
+	      this._systems.forEach(function (system) {
+	        if (!_this3._runStatus) {
+	          return;
+	        }
+	        system.predictUpdate && system.predictUpdate.apply(system, _arguments2);
 	      });
 	    }
 	  }, {
@@ -156,6 +217,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
+	      if (this._benchMarkInterval) {
+	        clearInterval(this._benchMarkInterval);
+	        for (var i in this._totalTime) {
+	          this._totalTime[i] = 0;
+	        }
+	        for (var _i in this._maxTime) {
+	          this._maxTime[_i] = 0;
+	        }
+	        this._benchMarkIndex = 0;
+	      }
 	      this._tuples = {
 	        '': new _tuple2.default([])
 	      };
@@ -194,6 +265,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'addSystem',
 	    value: function addSystem(system) {
+	      if (this._benchMark) {
+	        this._maxSystemNameLength = Math.max(this._maxSystemNameLength, system.name.length);
+	        this._totalTime[system.name] = 0;
+	        this._maxTime[system.name] = 0;
+	      }
 	      this._systems.push(system);
 	      system.addWorld(this);
 	      system.init();
@@ -238,10 +314,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'addEntity',
 	    value: function addEntity(entity) {
-	      entity.addToWorld(this);
 	      for (var name in this._tuples) {
 	        this._tuples[name].addEntityIfMatch(entity);
 	      }
+	      entity.addToWorld(this);
 	      return this;
 	    }
 	  }, {
@@ -259,6 +335,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var tuple = this._ensureTupleExists(arguments);
 
 	      return tuple.entities;
+	    }
+	  }, {
+	    key: 'getEntitiesList',
+	    value: function getEntitiesList() {
+	      var entities = this.getEntities.apply(this, arguments);
+	      var list = [];
+	      for (var name in entities) {
+	        list.push(entities[name]);
+	      }
+	      return list;
 	    }
 	  }, {
 	    key: 'getEntity',
@@ -406,6 +492,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  _createClass(Entity, [{
+	    key: "inWorld",
+	    value: function inWorld() {
+	      return this._world !== undefined;
+	    }
+	  }, {
 	    key: "destroy",
 	    value: function destroy() {
 	      if (this._world) {
@@ -668,6 +759,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this._checkWorld();
 	      return (_world = this._world).getEntities.apply(_world, arguments);
+	    }
+	  }, {
+	    key: 'getEntitiesList',
+	    value: function getEntitiesList() {
+	      var _world2;
+
+	      this._checkWorld();
+	      return (_world2 = this._world).getEntitiesList.apply(_world2, arguments);
 	    }
 	  }, {
 	    key: 'getEntity',
