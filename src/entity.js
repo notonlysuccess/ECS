@@ -22,7 +22,7 @@ export default class Entity {
   }
 
   inWorld() {
-    return this._world === undefined
+    return this._world !== undefined
   }
 
   destroy() {

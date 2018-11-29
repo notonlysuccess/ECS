@@ -63,13 +63,13 @@ export default class World {
       }
       if (this._benchMark) {
         const s = Date.now()
-        system.update.apply(system, arguments)
+        system.update && system.update.apply(system, arguments)
         const cost = Date.now() - s
         this._maxTime[system.name] = Math.max(this._maxTime[system.name], cost)
         this._totalTime[system.name] += cost
       } else {
         // usually arguments is dt(delta time of this update and last update) and now(the current time)
-        system.update.apply(system, arguments)
+        system.update && system.update.apply(system, arguments)
       }
     })
     if (this._benchMark) {
@@ -77,6 +77,15 @@ export default class World {
       this._maxTime.total = Math.max(this._maxTime.total, cost)
       this._totalTime.total += cost
     }
+  }
+
+  predictUpdate() {
+    this._systems.forEach(system => {
+      if (!this._runStatus) {
+        return
+      }
+      system.predictUpdate && system.predictUpdate.apply(system, arguments)
+    })
   }
 
   stop() {

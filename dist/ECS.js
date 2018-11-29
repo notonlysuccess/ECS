@@ -178,13 +178,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        if (_this2._benchMark) {
 	          var s = Date.now();
-	          system.update.apply(system, _arguments);
+	          system.update && system.update.apply(system, _arguments);
 	          var cost = Date.now() - s;
 	          _this2._maxTime[system.name] = Math.max(_this2._maxTime[system.name], cost);
 	          _this2._totalTime[system.name] += cost;
 	        } else {
 	          // usually arguments is dt(delta time of this update and last update) and now(the current time)
-	          system.update.apply(system, _arguments);
+	          system.update && system.update.apply(system, _arguments);
 	        }
 	      });
 	      if (this._benchMark) {
@@ -192,6 +192,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._maxTime.total = Math.max(this._maxTime.total, cost);
 	        this._totalTime.total += cost;
 	      }
+	    }
+	  }, {
+	    key: 'predictUpdate',
+	    value: function predictUpdate() {
+	      var _this3 = this,
+	          _arguments2 = arguments;
+
+	      this._systems.forEach(function (system) {
+	        if (!_this3._runStatus) {
+	          return;
+	        }
+	        system.predictUpdate && system.predictUpdate.apply(system, _arguments2);
+	      });
 	    }
 	  }, {
 	    key: 'stop',
@@ -481,7 +494,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Entity, [{
 	    key: "inWorld",
 	    value: function inWorld() {
-	      return this._world === undefined;
+	      return this._world !== undefined;
 	    }
 	  }, {
 	    key: "destroy",
