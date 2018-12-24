@@ -1,8 +1,6 @@
 import Tuple from './tuple'
 
 const OUTPUT_INTERVAL = 5000
-const WARNING = 'color: red;'
-const NORMAL = 'color: black;'
 
 export default class World {
   constructor() {
@@ -31,8 +29,24 @@ export default class World {
     this._maxSystemNameLength = 0
   }
 
-  openBenchMark() {
+  openBenchMark({
+    averageTimeLimit = 0.2,
+    maxTimeLimit = 5,
+  } = {}) {
+    this._averageTimeLimit = averageTimeLimit
+    this._maxTimeLimit = maxTimeLimit
     this._benchMark = true
+  }
+
+  _outputBenchMark(name) {
+    const average = (this._totalTime[name] * 1000 / (this._benchMarkIndex * OUTPUT_INTERVAL * 16)).toFixed(2)
+    const padName = `${name.padEnd(this._maxSystemNameLength, ' ')}`
+    const maxTime = `[maxTime: ${String(this._maxTime[name]).padStart(3, ' ')}ms]`
+    const averageTime = `[average: ${String(average).padStart(5, ' ')}ms]`
+    const totalTime = `[totalTime: ${this._totalTime[name]}ms]`
+    if (average > this._averageTimeLimit || this._maxTime[name] > this._maxTimeLimit) {
+      console.log(`${padName} ${maxTime} ${averageTime} ${totalTime}`)
+    }
   }
 
   start() {
@@ -44,12 +58,17 @@ export default class World {
     this._runStatus = true
 
     if (this._benchMark) {
+      for (const i in this._totalTime) {
+        this._totalTime[i] = 0
+      }
+      for (const i in this._maxTime) {
+        this._maxTime[i] = 0
+      }
       this._benchMarkInterval = setInterval(() => {
         console.log('---------------')
         console.log('benchmark ' + this._benchMarkIndex++ + ' time:')
         for (const name in this._totalTime) {
-          const average = (this._totalTime[name] * 1000 / (this._benchMarkIndex * OUTPUT_INTERVAL * 16)).toFixed(2)
-          console.log(`${name.padEnd(this._maxSystemNameLength, ' ')} %c [maxTime: ${String(this._maxTime[name]).padStart(3, ' ')}ms] %c [average: ${String(average).padStart(5, ' ')}ms] [totalTime: ${this._totalTime[name]}ms]`, this._maxTime[name] > 10 ? WARNING : NORMAL, average > 3 ? WARNING : NORMAL)
+          this._outputBenchMark(name)
         }
       }, OUTPUT_INTERVAL)
     }
