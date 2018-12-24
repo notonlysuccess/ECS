@@ -25,6 +25,8 @@ export default class World {
     this._maxTime = {
       total: 0
     }
+    this._beginTime = {
+    }
     this._benchMarkIndex = 0
     this._maxSystemNameLength = 0
   }
@@ -53,6 +55,29 @@ export default class World {
     }
   }
 
+  beginBenchMark(name) {
+    if (!this._benchMark) {
+      return
+    }
+    this._beginTime[name] = Date.now()
+  }
+
+  endBenchMark(name) {
+    if (!this._benchMark || this._beginTime[name] === undefined) {
+      return
+    }
+    if (this._maxTime[name] === undefined) {
+      this._maxTime[name] = 0
+    }
+    if (this._totalTime[name] === undefined) {
+      this._totalTime[name] = 0
+    }
+
+    const cost = Date.now() - this._beginTime[name]
+    this._maxTime[name] = Math.max(this._maxTime[name], cost)
+    this._totalTime[name] += cost
+  }
+
   update() {
     if (this._benchMark) {
       this._updateStartTime = Date.now()
@@ -62,11 +87,9 @@ export default class World {
         return
       }
       if (this._benchMark) {
-        const s = Date.now()
+        this.beginBenchMark(system.name)
         system.update && system.update.apply(system, arguments)
-        const cost = Date.now() - s
-        this._maxTime[system.name] = Math.max(this._maxTime[system.name], cost)
-        this._totalTime[system.name] += cost
+        this.endBenchMark(system.name)
       } else {
         // usually arguments is dt(delta time of this update and last update) and now(the current time)
         system.update && system.update.apply(system, arguments)
@@ -114,6 +137,7 @@ export default class World {
     this._systems = []
     this._backgroundSystems = []
     this._runStatus = false
+    this._components = {}
   }
 
   // components
