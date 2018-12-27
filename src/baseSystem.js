@@ -23,7 +23,7 @@ export default class BaseSystem {
   static _checkWorld() {
     if (this._world === undefined) {
       console.error('System did\'t add to world')
-      throw 'System did\'t add to world'
+      throw new Error('System did\'t add to world')
     }
   }
 

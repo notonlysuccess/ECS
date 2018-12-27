@@ -49,10 +49,10 @@ export default class World {
     }
   }
 
-  start() {
+  start(...args) {
     if (!this._runStatus) {
       this._backgroundSystems.forEach(system => {
-        system.start()
+        system.start(...args)
       })
     }
     this._runStatus = true
